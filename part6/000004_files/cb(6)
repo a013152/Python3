@@ -1,0 +1,559 @@
+var ths_stat=function(){this.id=0;this.ld=this.getLd();try{if("undefined"!=typeof external&&"undefined"!=typeof external.createObject)this.ld="client"}catch(a){}var b="https:"==document.location.protocol?"https:":"http:";this._top=!0;this.size=screen.width+"x"+screen.height;this._base=b+"//stat.10jqka.com.cn/q?";this._sid="__ths_stat__"};
+ths_stat.prototype.getLd=function(){var a="browser",a=navigator.userAgent.toLowerCase();return a=-1!=a.indexOf("android")?"mobile":-1!=a.indexOf("iphone")?"mobile":-1!=a.indexOf("ipad")?"mobile":"browser"};ths_stat.prototype._navigate=function(a){var b=document.getElementById(this._sid);if(!b)b=document.createElement("img"),b.id=this._sid,b.height=0,b.width=0,b.setAttribute("style","display:none"),document.body.appendChild(b);b.src=a};
+ths_stat.prototype.add=function(a,b){if(a&&b)this.id=a,this.ld=b;else if(a instanceof Object)for(k in a)this[k]=a[k];else if(a)this.id=a};ths_stat.prototype._setLocation=function(){if(this._top&&top)try{if(!this.ref)this.ref=top.document.referrer;if(!this.url)this.url=top.location.href}catch(a){}if(!this.ref)this.ref=document.referrer?document.referrer:null;if(!this.url)this.url=window.location.href;this.cs=document.body.clientWidth+"x"+document.body.clientHeight;this.ts=(new Date).getTime()};
+ths_stat.prototype._getUrl=function(){this._setLocation();var a=[];if(!window.__ta_performance){if(window.performance&&window.performance.timing){var b=window.performance.timing;try{a.push("dt="+(b.domainLookupEnd-b.domainLookupStart)+"&"),a.push("tt="+(b.connectEnd-b.connectStart)+"&"),a.push("rt="+(b.responseStart-b.requestStart)+"&"),a.push("bt="+(b.responseStart-b.navigationStart)+"&"),a.push("sp=1")}catch(c){}}else a.push("sp=0");window.__ta_performance=!0}for(k in this)k&&"_"!=k.charAt(0)&&
+this[k]&&"function"!=typeof this[k]&&(a.length&&a.push("&"),a=a.concat([encodeURIComponent(k),"=",encodeURIComponent(this[k])]));return this._base+a.join("")};ths_stat.prototype.log=function(){this._navigate(this._getUrl())};
+ths_stat.prototype.getEvent=function(a){a=a?a:windows.event;if(null==a.pageX&&null!=a.clientX){var b=document.documentElement,c=document.body;a.pageX=a.clientX+(b&&b.scrollLeft||c&&c.scrollLeft||0)-(b&&b.clientLeft||c&&c.clientLeft||0);a.pageY=a.clientY+(b&&b.scrollTop||c&&c.scrollTop||0)-(b&&b.clientTop||c&&c.clientTop||0)}return a};ths_stat.prototype._onClick=function(a){a=this.getEvent(a);a=a.pageX+","+a.pageY;this._navigate(this._getUrl()+"&mouse="+a)};
+ths_stat.prototype.bindClick=function(a,b){var c=this,d=function(d){for(index in b)attr=b[index],c[attr]=a.getAttribute(attr);c._onClick(d)};a.addEventListener?a.addEventListener("click",d,!1):a.attachEvent("onclick",d)};
+var TA={log:function(){var a=new ths_stat;a.add.apply(a,arguments);a.log()},logClick:function(){var a=new ths_stat;a.add.apply(a,arguments);a.bindClick.call(a,window)},logArchorClick:function(){var a=new ths_stat;a.add.apply(a,arguments);for(var b=document.getElementsByTagName("a"),c=0;c<b.length;++c)a.bindClick.call(a,b[c],["href"])},logElementClick:function(a,b){var c=new ths_stat;c.add(b);c.bindClick.call(c,a)}};
+var PerformanceAnalytics=function(options){var self=this,_error={},_dom=[],ERROR={OK:{code:0,msg:""},NO_TA:{code:-1,msg:"TA script is undefined"},NO_PARAMS:{code:-2,msg:"Params are undefined"},NO_TA_ID:{code:-3,msg:"Statid are undefined"},LOW_BROWSER_VERSION:{code:-4,msg:"Browser version is too low"}},MODE={SINGLE:1,MULTIPLE:2};var _init=function(){if(!_verify()){return false}options=options||{};options.id=options.id||null;options.url=options.url||null;options.mode=options.mode||MODE.SINGLE;imgId="_performance_analytics_";_initDomReadyHandler();_addEventListener()};var _initDomReadyHandler=function(){_dom.isReady=false;_dom.ready=function(fn){if(_dom.isReady){fn()}else{_dom.push(fn)}};_dom.fireReady=function(){if(!_dom.isReady){if(!document.body){return setTimeout(_dom.fireReady,16)}_dom.isReady=1;if(_dom.length){for(var i=0,fn;fn=_dom[i];i++){fn()}}}};if(document.readyState==="complete"){_dom.fireReady()}else{if(+"\v1"){document.addEventListener("DOMContentLoaded",function(){document.removeEventListener("DOMContentLoaded",arguments.callee,false);_dom.fireReady()},false)}else{document.attachEvent("onreadystatechange",function(){if(document.readyState=="complete"){document.detachEvent("onreadystatechange",arguments.callee);_dom.fireReady()}});(function(){if(_dom.isReady){return}var node=new Image;try{node.doScroll();node=null}catch(e){setTimeout(arguments.callee,64);return}_dom.fireReady()})()}}};var _verify=function(){if(undefined==options){_error=ERROR.NO_PARAMS;return false}if(!TA||!TA.log){_error=ERROR.NO_TA;return}if(typeof options=="string"||typeof options=="number"){options={id:options}}if(!options.id){_error=ERROR.NO_TA_ID;return false}return true};var _getVersion=function(callback){var hxVersion="";if(window.cefQuery){var request={v:"1.0",method:"Util.getHxVer",params:[],sessionId:window.cefNewSession("Util").sessionId};window.cefQuery({request:JSON.stringify(request),persistent:false,onSuccess:function(version){callback(version)},onFailure:function(){callback(hxVersion)}});return}else{if(window.external&&"createObject" in window.external){try{var util=external.createObject("Util");hxVersion=util.getHxVer();var hxVerArr=hxVersion.split(".");hxVersion=hxVerArr[0].substr(3)+"."+hxVerArr[1]+"."+hxVerArr[2]}catch(e){}}}callback(hxVersion)};var _initStartTime=function(){var performance,startTime=false;performance=window.performance||window.msPerformance||window.webkitPerformance||window.mozPerformance;if(performance&&performance.timing&&performance.timing.navigationStart){startTime=performance.timing.navigationStart}else{if(window.chrome&&window.chrome.csi&&window.chrome.csi().startE){startTime=w.chrome.csi().startE}else{if(window.gtbExternal&&window.gtbExternal.startE()){startTime=window.gtbExternal.startE()}}}if(navigator.userAgent.match(/Firefox\/[78]\./)){this.navigationStart=performance.timing.unloadEventStart||performance.timing.fetchStart||undefined}return startTime};self.pageLoad=function(){var startTime,endTime,loadTime,data=options,cv;startTime=PA.startTime||_initStartTime();_getVersion(function(version){if(startTime===false){_error=ERROR.LOW_BROWSER_VERSION;data.cv=version}else{endTime=new Date().getTime();loadTime=endTime-startTime;data.cv=version;data.lt=loadTime}if(options.url!==null&&startTime!==false){self.send(_getUrl(options.url,data));if(options.mode==MODE.MULTIPLE){TA.log(data)}}else{setTimeout(function(){TA.log(data)})}});return _error.code>=0};self.send=function(url){var el=document.getElementById(imgId);if(!el){el=document.createElement("img");el.id=imgId;el.height=0;el.width=0;el.setAttribute("style","display:none");document.body.appendChild(el)}el.src=url;return el};self.getErrorCode=function(){return _error.code};self.getErrorMsg=function(){return _error.msg};var _getUrl=function(url,options){url+=url.indexOf("?")>-1?"&":"?";var optionArr=[];for(k in options){if(k&&options[k]&&typeof(options[k])!="function"){if(optionArr.length){optionArr.push("&")}optionArr=optionArr.concat([encodeURIComponent(k),"=",encodeURIComponent(options[k])])}}return url+optionArr.join("")};var _addEventListener=function(){_dom.ready(self.pageLoad)};_init()};var PA=TA||{};PA.instance=null;PA.init=function(options){try{PA.instance=new PerformanceAnalytics(options)}catch(exp){}};PA.getErrorCode=function(){return PA.instance.getErrorCode()};PA.getErrorMsg=function(){return PA.instance.getErrorMsg()};PA.startTime="";PA.setStartTime=function(time){this.startTime=time||new Date().getTime()};/*
+ * Lazy Load - jQuery plugin for lazy loading images
+ *
+ * Copyright (c) 2007-2012 Mika Tuupola
+ *
+ * Licensed under the MIT license:
+ *   http://www.opensource.org/licenses/mit-license.php
+ *
+ * Project home:
+ *   http://www.appelsiini.net/projects/lazyload
+ *
+ * Version:  1.7.2
+ *
+ */
+(function($, window) {
+
+    $window = $(window);
+
+    $.fn.statload = function(options) {
+        var elements = this;
+        var settings = {
+            threshold       : 0,
+            failure_limit   : 0,
+            event           : "scroll",
+            effect          : "show",
+            container       : window,
+            data_attribute  : "original",
+            skip_invisible  : true,
+            appear          : null,
+            load            : null
+        };
+
+        function update() {
+            var counter = 0;
+      
+            elements.each(function() {
+                var $this = $(this);
+                if (settings.skip_invisible && !$this.is(":visible")) {
+                    return;
+                }
+                if ($.abovethetop(this, settings) ||
+                    $.leftofbegin(this, settings)) {
+                        /* Nothing. */
+                } else if (!$.belowthefold(this, settings) &&
+                    !$.rightoffold(this, settings)) {
+                        $this.trigger("appear");
+                } else {
+                    if (++counter > settings.failure_limit) {
+                        return false;
+                    }
+                }
+            });
+
+        }
+
+        if(options) {
+            /* Maintain BC for a couple of versions. */
+            if (undefined !== options.failurelimit) {
+                options.failure_limit = options.failurelimit; 
+                delete options.failurelimit;
+            }
+            if (undefined !== options.effectspeed) {
+                options.effect_speed = options.effectspeed; 
+                delete options.effectspeed;
+            }
+
+            $.extend(settings, options);
+        }
+
+        /* Cache container as jQuery as object. */
+        $container = (settings.container === undefined ||
+                      settings.container === window) ? $window : $(settings.container);
+
+        /* Fire one scroll event per scroll. Not one scroll event per image. */
+        if (0 === settings.event.indexOf("scroll")) {
+            $container.bind(settings.event, function(event) {
+                return update();
+            });
+        }
+
+        this.each(function() {
+            var self = this;
+            var $self = $(self);
+
+            self.loaded = false;
+
+            /* When appear is triggered load original image. */
+            $self.one("appear", function() {
+                if (!this.loaded) {
+                    if (settings.appear) {
+                        var elements_left = elements.length;
+                        settings.appear.call(self, elements_left, settings);
+                    }
+                    var stat = $(this).attr("stat");
+                    TA.log({'id':stat,_top:false,nj:1,_sid:"__ths_"+stat});
+                }
+            });
+
+            /* When wanted event is triggered load original image */
+            /* by triggering appear.                              */
+            if (0 !== settings.event.indexOf("scroll")) {
+                $self.bind(settings.event, function(event) {
+                    if (!self.loaded) {
+                        $self.trigger("appear");
+                    }
+                });
+            }
+        });
+
+        /* Check if something appears when window is resized. */
+        $window.bind("resize", function(event) {
+            update();
+        });
+
+        /* Force initial check if images should appear. */
+        update();
+        
+        return this;
+    };
+
+    /* Convenience methods in jQuery namespace.           */
+    /* Use as  $.belowthefold(element, {threshold : 100, container : window}) */
+
+    $.belowthefold = function(element, settings) {
+        var fold;
+        
+        if (settings.container === undefined || settings.container === window) {
+            fold = $window.height() + $window.scrollTop();
+        } else {
+            fold = $container.offset().top + $container.height();
+        }
+
+        return fold <= $(element).offset().top - settings.threshold;
+    };
+    
+    $.rightoffold = function(element, settings) {
+        var fold;
+
+        if (settings.container === undefined || settings.container === window) {
+            fold = $window.width() + $window.scrollLeft();
+        } else {
+            fold = $container.offset().left + $container.width();
+        }
+
+        return fold <= $(element).offset().left - settings.threshold;
+    };
+        
+    $.abovethetop = function(element, settings) {
+        var fold;
+        
+        if (settings.container === undefined || settings.container === window) {
+            fold = $window.scrollTop();
+        } else {
+            fold = $container.offset().top;
+        }
+
+        return fold >= $(element).offset().top + settings.threshold  + $(element).height();
+    };
+    
+    $.leftofbegin = function(element, settings) {
+        var fold;
+        
+        if (settings.container === undefined || settings.container === window) {
+            fold = $window.scrollLeft();
+        } else {
+            fold = $container.offset().left;
+        }
+
+        return fold >= $(element).offset().left + settings.threshold + $(element).width();
+    };
+
+    $.inviewport = function(element, settings) {
+         return !$.rightofscreen(element, settings) && !$.leftofscreen(element, settings) && 
+                !$.belowthefold(element, settings) && !$.abovethetop(element, settings);
+     };
+
+    /* Custom selectors for your convenience.   */
+    /* Use as $("img:below-the-fold").something() */
+
+    $.extend($.expr[':'], {
+        "below-the-fold" : function(a) { return $.belowthefold(a, {threshold : 0, container: window}); },
+        "above-the-top"  : function(a) { return !$.belowthefold(a, {threshold : 0, container: window}); },
+        "right-of-screen": function(a) { return $.rightoffold(a, {threshold : 0, container: window}); },
+        "left-of-screen" : function(a) { return !$.rightoffold(a, {threshold : 0, container: window}); },
+        "in-viewport"    : function(a) { return !$.inviewport(a, {threshold : 0, container: window}); },
+        /* Maintain BC for couple of versions. */
+        "above-the-fold" : function(a) { return !$.belowthefold(a, {threshold : 0, container: window}); },
+        "right-of-fold"  : function(a) { return $.rightoffold(a, {threshold : 0, container: window}); },
+        "left-of-fold"   : function(a) { return !$.rightoffold(a, {threshold : 0, container: window}); }
+    });
+
+})(jQuery, window);//@charset "gbk";
+$(document).ready(function(){
+    var xgPopLink = {
+        data : null,	//数据存放
+        size : null,	//表格每页条数
+        page : null,	//表格页码
+        index: null,	//表格排序数据项序号
+        order: null,	//表格排序类型
+        cindex:null,	//表格可变列的数据项序号
+        code : $('#stockCode').val(),	//当前股票代码
+        catecode : $('#catecode').val(),	//页面
+        datasource : null,	//数据类型
+        number : null,	//数据类型
+        errorflag: null,//存放数据请求结果是否有误（true：失败；false：成功）
+        curcid: null,	//当前概念id
+        target: null,	//窗口对象存放
+        innerHtml: '',	//窗口内容存放
+        topStockArr: [],//龙头股
+        tempHtml : [
+            '<a href="javascript:void(0);" class="close">X</a>',
+            '<h2 class="table_tit"><span class="tip">符合策略上市公司名单</span></h2>',
+            '<div class="table_con">' +
+                '<i class="iconimg" style="display: none;"></i>'+
+                '<table class="table_comment">',
+                    '<tbody><tr>',
+                    '<td><div class="aside">投顾点评</div></td>',
+                    '<td class="cont"></td>',
+                    '</tr></tbody>',
+                '</table>',
+                '<div id="xg_table">{table}</div>',
+            '</div>'
+        ],
+        tempTable:[
+            '<table class="m_table m_hl">',
+            '<thead>',
+            '<tr>',
+            '<th class="nosort" width="30px">排名</th>',
+            '<th class="nosort" width="70px">股票简称</th>',
+            '{theadcontent}',
+            '</tr>',
+            '</thead>',
+            '<tbody>{tablecontent}</tbody>',
+            '</table>',
+            '<div class="m_page main_page mti5">{pagecontent}</div>'
+        ],
+        init: function(){
+            this.tempHtml = this.tempHtml.join('');
+            this.tempTable = this.tempTable.join('');
+            this.tempHtml = this.tempHtml.replace(/\{table\}/, this.tempTable);
+            $("body").append('<div class="xgcl_pop" id="xg_pop" style="display: none;height:auto"></div>');
+            this.target = $('#xg_pop');
+            $("body").append('<div class="xg_mask" style="display: none;"></div>');
+        },
+        initData:function(){
+            xgPopLink.size = 10;
+            xgPopLink.page = 1;
+            xgPopLink.index = 2;
+            xgPopLink.order = 'desc';
+            xgPopLink.cindex = 2;
+        },
+        show:function(){
+            this.getData();
+        },
+        close: function(){
+            this.target.hide();
+            $('.xg_mask').hide();
+        },
+        getData:function(){
+            var dsNum = this.number;
+            xgPopLink.errorflag = true;
+            if($('#xg_pop_data'+dsNum).length < 1){
+                $.ajax({
+                    type		: "GET",
+        			async		: false,
+                    data		: {cid:this.catecode, code:this.code , datasource:this.datasource , number:this.number},
+                    //url 		: "/ajax/stock/concept.php",
+                    url 		: 'http://basic.10jqka.com.cn/api/stock/zgjh.php',
+                    success		:function(data) {
+                        try {
+                            data = eval('('+data+')');
+                            if (typeof data['errorcode'] == 'undefined' || data['errorcode']) return;
+                            $('<div id="xg_pop_data'+ dsNum +'" style="display: none;"></div>').data('xg_data',data).appendTo($('body'));
+                            xgPopLink.handleData(data);
+                        } catch (e) {
+                        }
+                    }
+                });
+            }else{
+                var data = $('#xg_pop_data'+dsNum).data('xg_data');
+                xgPopLink.handleData(data);
+            }
+        },
+        handleData: function(data){
+            try {
+                xgPopLink.initData();
+                xgPopLink.data = data['result'];
+                xgPopLink.tempReplace();
+                xgPopLink.target.html(xgPopLink.innerHtml);
+                $('#xg_pop .table_comment .cont').html(xgPopLink.data.comment);
+                xgPopLink.target.show();
+                $('.xg_mask').show();
+                xgPopLink.errorflag = false;
+            } catch (e) {}
+        },
+        tempReplace:function(){
+        	var theadcontent = xgPopLink.getTheadContent();
+            var tablecontent = xgPopLink.getTableContent();
+            var pagecontent = xgPopLink.getTablePage();
+            xgPopLink.innerHtml = xgPopLink.tempHtml;
+            xgPopLink.innerHtml = xgPopLink.innerHtml.replace(/\{tablecontent\}/, tablecontent);
+            xgPopLink.innerHtml = xgPopLink.innerHtml.replace(/\{theadcontent\}/, theadcontent);
+            xgPopLink.innerHtml = xgPopLink.innerHtml.replace(/\{pagecontent\}/, pagecontent);
+        },
+        getTableContent: function(){
+            var data = [],
+                ld = jQuery.extend(true, {}, xgPopLink.data.listdata);
+            for(var key in ld){
+                data.push(ld[key]);
+            }
+            data = xgPopLink.sortData(data[0]);
+            var dom = [],highlight=' objselected',
+                start = xgPopLink.size*(xgPopLink.page-1), end=start+xgPopLink.size-1;
+            //记录排名
+            for(var key in data){
+                data[key].push(parseInt(key)+1);
+            }
+            //将置顶股置顶
+            var topStockArr = xgPopLink.topStockArr;
+            for(var i = 0; i < topStockArr.length; i++){
+                var stockcode = topStockArr[i];
+                var tempStock;
+                for(var key in data){
+                    if (stockcode == data[key][0]){
+                        var tempStock = data.splice(key, 1);
+                        data.unshift(tempStock[0]);
+                        continue;
+                    }
+                }
+            }
+            //组成dom
+            for(var key in data){
+                var ldom = '';
+                if (key>=start){
+                    if(!!topStockArr[key] && topStockArr.length == 1){
+                        ldom = '<tr class="c_highlight">';
+                    }else{
+                        ldom = '<tr>';
+                    }
+                    for(var i = 0; i < data[key].length; i++){
+                        //删去多余项
+                        if(i >= 2 + xgPopLink.data.toptitle.length){
+                            break;
+                        }
+                        var temp;
+                        if(i == 0){
+                            temp = data[key][data[key].length - 1];
+                        }else if(i ==1){
+                            temp = data[key][i]?'<a class="jumpto tip" href="###" code="'+data[key][0]+'" name="'+this.catecode+'.html" taid="">'+data[key][i]+'</a>':'-';
+                        }else{
+                        	 temp = data[key][i]?data[key][i]:'-';
+                        }
+                        ldom += '<td class="tc'+(i==xgPopLink.cindex?highlight:'')+'">'+temp+'</td>';
+                    }
+                    ldom += '</tr>';
+                    dom.push(ldom);
+                }
+                if (key>=end) break;
+            }
+            return dom.join('');
+        },
+        getTheadContent: function(){
+            var tt = xgPopLink.data.toptitle, o ,order=' '+xgPopLink.order, dom = '';
+//            var flag = true;
+//            var nameList = new Array('最新机构评级','业绩预增');
+            for(var i = 0; i < tt.length; i++){
+//            	flag = false;
+//            	for(var j=0; j<nameList.length; j++){
+//            		if (tt[i][0].indexOf(nameList[j])!='-1'){
+//            			flag= true;
+////            			xgPopLink.index++;
+////            			console.log(xgPopLink.index);
+//            			break;
+//            		}
+//            	}
+                o = i+2;
+                if (tt[i][1]) {
+                    var unit = '('+tt[i][1]+')';
+                } else {
+                    var unit = '';
+                }
+//                if (flag){
+//                	dom += '<th class="nosort" width="70px">'+tt[i][0]+'</th>';
+//                }else{
+                	dom += '<th class="head '+(o==xgPopLink.index?order:'')+'" tag="'+o+'">'+tt[i][0]+unit+'<s></s></th>';
+                	
+//                }
+            }
+            return dom;
+        },
+        getTablePage: function(){
+            var data=[],
+                ld=xgPopLink.data.listdata;
+            ld = $.extend(true, {}, ld);
+            for(var key in ld){
+                data.push(ld[key]);
+            }
+
+            var dom=[],tnum=data[0].length,tpage=Math.ceil(tnum/xgPopLink.size),page=xgPopLink.page;
+            var pinfo = window.getPagingInfo(page, tpage);
+
+            for (var x in pinfo) {
+                var ldom = '<a class="'
+                    +(pinfo[x].iscur?'cur':(pinfo[x].page?'gn_page':'disable'))
+                    +'" page="'+pinfo[x].page+'" href="javascript:void(0)">'
+                    +pinfo[x].name+'</a>';
+                dom.push(ldom);
+            }
+            if(pinfo.length == 3){
+                dom = [];
+            }
+            return dom.join('');
+        },
+        sortData:function(data){
+            for(var i=0;i<data.length;i++){
+                for(var j=i;j<data.length;j++){
+                	if(isNaN(data[i][xgPopLink.index])){
+                		var v1 = getRank(data[i][xgPopLink.index]),
+                		v2 = getRank(data[j][xgPopLink.index]),
+                		t;
+                		if (xgPopLink.order == 'desc') {
+                			if(isNaN(v1) || (!isNaN(v2) && v1 < v2)){
+                				t=data[i];
+                				data[i]=data[j];
+                				data[j]=t;
+                			}
+                		} else {
+                			if(isNaN(v1) || (!isNaN(v2) && v1 > v2)){
+                				t=data[i];
+                				data[i]=data[j];
+                				data[j]=t;
+                			}
+                		}
+                	}else{
+                		var v1 = parseFloat(data[i][xgPopLink.index]),
+                		v2 = parseFloat(data[j][xgPopLink.index]),
+                		t;
+                		if (xgPopLink.order == 'desc') {
+                			if(isNaN(v1) || (!isNaN(v2) && v1 < v2)){
+                				t=data[i];
+                				data[i]=data[j];
+                				data[j]=t;
+                			}
+                		} else {
+                			if(isNaN(v1) || (!isNaN(v2) && v1 > v2)){
+                				t=data[i];
+                				data[i]=data[j];
+                				data[j]=t;
+                			}
+                		}
+                	}
+            	}
+            }
+            return data;
+        },
+        changeOrder:function(tag){
+            tag=tag?tag:xgPopLink.cindex;
+            if (xgPopLink.index == tag) {
+                xgPopLink.order=xgPopLink.order=='desc'?'asc':'desc';
+            } else {
+                xgPopLink.order='desc';
+            }
+            xgPopLink.index = tag;
+            xgPopLink.page = 1;
+            xgPopLink.changeTable();
+        },
+        changePage:function(page){
+            if (xgPopLink.page == page) return;
+            xgPopLink.page = page;
+            xgPopLink.changeTable();
+        },
+        changeTable:function(){
+            var tablecontent = xgPopLink.getTableContent();
+            var theadcontent = xgPopLink.getTheadContent();
+            var pagecontent  = xgPopLink.getTablePage();
+            var tableDom = xgPopLink.tempTable.replace(/\{tablecontent\}/, tablecontent);
+            tableDom = tableDom.replace(/\{theadcontent\}/, theadcontent);
+            tableDom = tableDom.replace(/\{pagecontent\}/, pagecontent);
+            xgPopLink.target.find('#xg_table').html(tableDom);
+        }
+    };
+
+
+    function pop(){
+        xgPopLink.init();
+        $(document).delegate(".J_xgPopLink", "click", function(){
+            //取出标的股票
+            xgPopLink.topStockArr = [$('#stockCode').val()];
+            xgPopLink.datasource = $(this).find('.dataSource').attr('data');
+            xgPopLink.number = $(this).find('.dataSource').attr('number');
+            xgPopLink.show();
+        });
+        $(document).delegate("#xg_pop .close", "click", function(){
+            xgPopLink.close();
+        });
+        $(document).delegate("#xg_table .head", "click", function(){
+            xgPopLink.changeOrder($(this).attr('tag'));
+        });
+        $(document).delegate("#xg_table .gn_page", "click", function(){
+            xgPopLink.changePage($(this).attr('page'));
+        });
+    }
+    function getRank($name) {
+    	
+    	if($name=='预增'){
+    		return 2;
+    	}else if($name=='扭亏'){
+    		return 1;
+    	}else if($name=='大幅上升'){
+    		return 3;
+    	}
+    	if($name=='续亏'){
+    		return 2;
+    	}else if($name=='增亏'){
+    		return 1;
+    	}else if($name=='预亏'){
+    		return 3;
+    	} 
+    	if($name=='超大盘股'){
+    		return 2;
+    	}else if($name=='大盘股'){
+    		return 1;
+    	}
+    	if($name=='买入'){
+    		return 1;
+    	}
+    	if($name.indexOf('万')!='-1'){
+    		return parseFloat($name.replace('万',''));
+    	}
+    	if($name.indexOf('-')!='-1'){		//对时间进行排序
+    		var reg=new RegExp("-","g"); //创建正则RegExp对象   g表示全文检索，而不是找到一个就停止
+//    		console.log($name.replace(reg,''));
+    		return $name.replace(reg,'');
+    	}
+    }
+
+    //pop弹窗
+    pop();
+    
+});
+
+// @charset "gbk";
+
+function clickTalogStat(id, fid)
+{
+	if (fid) {
+		TA.log({'id':id,'fid':fid,'nj':1});
+	} else {
+		TA.log({'id':id,'nj':1});
+	}
+}

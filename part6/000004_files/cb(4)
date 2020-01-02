@@ -1,0 +1,34 @@
+(function(){window.API={};var f={};window.bindSessionArr=[];window.cefQuery?(API.use=function(a){var c=a.persistent||!1,d=a.method.split(".")[0].toLowerCase();!f[d]&&!c&&(f[d]=API.createSessionId(d));if(null===a.data||void 0===a.data)a.data=[];if("[object Array]"!=Object.prototype.toString.call(a.data))a.data=[a.data];var e={v:a.version||"1.0",method:a.method,params:a.data,sessionId:a.sessionId||f[d]},b=null,g;c||(b=setTimeout(function(){window.cefQueryCancel(g);a.timeoutFunction?a.timeoutFunction(a.method,
+a.data):console.log("timeout["+a.method,"]params:",a.data)},a.timeout||3E4));g=window.cefQuery({request:JSON.stringify(e),persistent:c,onSuccess:function(c){b&&clearTimeout(b);a.success&&a.success(c)},onFailure:function(c,d){b&&clearTimeout(b);a.error?a.error(c,d):0===c?console.log(d):console.error("["+a.method+"] Interface call failure:\nerror_code:"+c,"\nerror_message:"+d,"\nparams:",a.data,"\nsessionId:"+e.sessionId)}})},API.createSessionId=function(a){a=window.cefNewSession(a.toLowerCase());bindSessionArr.push(a);
+return a.sessionId}):window.external&&"createObject"in window.external?(API.use=function(a){var c=a.method.split("."),d=c[1],c=c[0];f[c]||(f[c]=API.createSessionId(c));var c=a.sessionId||f[c],e,b=a.data;if(void 0!==b&&""!==b&&"[object Array]"!=Object.prototype.toString.call(b)){e={"Quote.request":"onready","Quote.sortRequest":"callback","external.registerEvent":"onshow"};if(a.callbackName||e[a.method])"[object Object]"!=Object.prototype.toString.call(b)&&(b={}),a.callbackName=a.callbackName||e[a.method],
+b[a.callbackName]=a.success;e=c[d](b)}else if("[object Array]"==Object.prototype.toString.call(b))switch(b.length){case 1:e=c[d](b[0]);break;case 2:e=c[d](b[0],b[1]);break;case 3:e=c[d](b[0],b[1],b[2]);break;case 4:e=c[d](b[0],b[1],b[2],b[3]);break;case 5:e=c[d](b[0],b[1],b[2],b[3],b[4]);break;case 6:e=c[d](b[0],b[1],b[2],b[3],b[4],b[5])}else e=c[d]();a.success&&!a.callbackName&&a.success(e)},API.createSessionId=function(a){if(-1<a.indexOf("external"))return external;-1<a.indexOf("fileReader")?a=
+"FileInputStream":-1<a.indexOf("fileWriter")&&(a="FileOutputStream");return external.createObject(a)}):(API.use=function(a){a.notClient&&a.notClient()},API.createSessionId=function(){return 0})})();
+function isIE6(){
+    var isIE = (document.all) ? true: false;
+    var ie6Flag = false;
+    if(isIE && navigator.userAgent.indexOf('MSIE 6.0') > 1){
+        ie6Flag = true;
+    }
+    return ie6Flag;
+}
+
+function isIE7(){
+    var isIE = (document.all) ? true: false;
+    var ie7Flag = false;
+    if(isIE && navigator.userAgent.indexOf('MSIE 7.0') > 1){
+        ie7Flag = true;
+    }
+    return ie7Flag;
+}
+
+/*
+* 获取当前tab
+* */
+function getTabType() {
+    var obj={
+        type:''
+    }
+    obj.type=$('#catecode').attr('value');
+    obj[obj.type]=true;
+    return obj;
+}

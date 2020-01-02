@@ -1,0 +1,252 @@
+// @charset "gbk";
+/**
+* 资本运作
+**/
+$(".iwcclick").mouseover(function(){
+	$(this).removeClass('hltip');
+	$(this).addClass('wencaibs');
+});
+$(".iwcclick").mouseout(function(){
+	$(this).removeClass('wencaibs');
+	$(this).addClass('hltip');
+})
+$('.iwcclick').click(function(){
+	$('.eventBox').hide();
+	if ($('.eventBox').is(":hidden") || $('.eventBox').length < 1) {
+		var taname = $(this).attr("taname");
+		sendTalog(taname);
+		sendTalog('f10_stock_iwc_bktotal');
+		var tag = $(this).attr("tag");
+		var content = $(this).attr("content");
+		var url = $(this).attr("data-url");
+		var html = box(tag, content, url, taname);
+		$("#"+tag).remove();
+		$("body").append(html);
+		var pos = $(this).offset();
+		var left = $(this).is('.gd_ques') ? pos.left-194 : pos.left-172;
+		$("#"+tag).css({left: left+"px",top: pos.top+20+"px"});
+		$("#"+tag).slideDown();
+	} else {
+		$('.eventBox').slideUp();
+		$(this).removeClass('wencaibs');
+		$(this).addClass('hltip');
+	}
+
+});
+
+function box(id, content, url, taname) {
+	url = url?url:'javascript:void(0)';
+	taname = taname+'xq#f10_stock_iwc_bktotalxq';
+	return [
+	    '<div class="eventBox" id="'+id+'"  style="display:none;width:240px;">',
+	    	'<div class="tipbox_hd">',
+	    		'<span class="ml10">I问财百科:</span>',
+	    	'</div>',
+	    	'<div class="tipbox_bd p0_5">',
+	    		'<span style="line-height:24px;" class="tip f14">&nbsp;&nbsp;&nbsp;&nbsp;'+content+'</span><span class="f14" style="color:#0199fa"></span>',
+	    	'</div>',
+	    	'<div class="arrow">',
+	    	'</div>',
+	    '</div>'
+	].join('');
+}
+
+function moreddhide() {
+	$('.eventBox').css('display', 'none');
+};
+$(document).click(function(e){
+	if($(e.target).closest('.iwcclick').length < 1 && $(e.target).closest('.eventBox').length < 1){
+		moreddhide();
+	}
+});// @charset "gbk";
+//设置cookie
+
+function setEvaluateCookie(name, value, time) {
+    var exp = new Date();
+    exp.setTime(exp.getTime() + time * 24 * 60 * 60 * 1000);
+    document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString() + ";path=/;domain=.10jqka.com.cn";
+}
+/**
+ * 用户评价
+ */
+$('.evaluate').delegate(".opinion_up,.opinion_down", "click", function() {
+    var target = $(this).closest(".evaluate");
+    var part = target.attr('tag');
+    var stockcode = $("#stockCode").val();
+    var type = $(this).attr('tag');
+    var ckname = part + stockcode;
+    if (type && !GetCookie(ckname)) {
+        $.ajax({
+            type: "POST",
+            url: "/ajax/userEvaluate.php",
+            data: { stockcode: stockcode, type: type, part: part },
+            success: function(data) {
+                setEvaluate(target, data);
+                //记录用户点击
+                //key value expires:day
+                setEvaluateCookie(ckname, 1, 1);
+            }
+        });
+    }
+});
+
+/**
+ * 修改评价
+ */
+function setEvaluate(obj, data) {
+    data = data.split(",");
+    obj.find(".opi_up").text(data[0]);
+    obj.find(".opi_down").text(data[1]);
+}
+/**
+ * 用户评价
+ */
+$('.evaluate .btn_survey').click(function() {
+    var url = $(this).attr('linksrc');
+    try {
+        external.createObject('Util');
+        window.API.use({
+            method: 'Util.openURL',
+            data: [url, 1]
+        });
+    } catch (e) {
+        window.open(url);
+    }
+});
+
+$(document).ready(function() {
+    var stockcode = $("#stockCode").val();
+    $('.evaluate').each(function() {
+        var target = $(this);
+        var part = target.attr('tag');
+        if (part) {
+            var stockcode = $("#stockCode").val();
+            var url = '/evaluate/' + stockcode + '/' + part + '.txt';
+            $.get(url, function(evaluate) {
+                setEvaluate(target, evaluate);
+            });
+        }
+    });
+});if ($("#news .newslist li .gray").length>0) {
+	$("#news .newslist li .gray").each(function(){
+		var text = $(this).attr('sctime');
+		var month = (new Date()).getMonth()+1;
+		var day = (new Date()).getDate();
+		if (day<10) {
+			day = '0'+day;
+		}
+
+		if (month<10) {
+			month = '0'+month;
+		}
+		if (text == month+'/'+day) {
+			$(this).text($(this).attr('todaytime'));
+		}
+	});
+}
+if ($("#mine #data_list_insert span.date").length>0) {
+	$("#mine #data_list_insert span.date").each(function(){
+		var text = $(this).attr('sctime');
+		var year = (new Date()).getFullYear();
+		var month = (new Date()).getMonth()+1;
+		var day = (new Date()).getDate();
+		if (day<10) {
+			day = '0'+day;
+		}
+		if (month<10) {
+			month = '0'+month;
+		}
+		var today = year+'-'+month+'-'+day;
+		if (text == today) {
+			$(this).text($(this).attr('todaytime'));
+		}
+	});
+}
+if ($("#pub .client").length>0) {
+	$("#pub .client").each(function(){
+		var text = $(this).attr('sctime');
+		var year = (new Date()).getFullYear();
+		var month = (new Date()).getMonth()+1;
+		var day = (new Date()).getDate();
+		if (day<10) {
+			day = '0'+day;
+		}
+		if (month<10) {
+			month = '0'+month;
+		}
+		var today = year+'-'+month+'-'+day;
+		if (text == today) {
+			$(this).parent().parent().find('.date').text($(this).attr('todaytime'));
+		}
+	});
+}
+if ($("#news .newslist dl dt span.date").length>0) {
+	$("#news .newslist dl dt span.date").each(function(){
+		var text = $(this).attr('sctime');
+		var year = (new Date()).getFullYear();
+		var month = (new Date()).getMonth()+1;
+		var day = (new Date()).getDate();
+		if (day<10) {
+			day = '0'+day;
+		}
+		if (month<10) {
+			month = '0'+month;
+		}
+		var today = year+'-'+month+'-'+day;
+		if (text == today) {
+			$(this).text('['+$(this).attr('todaytime')+']');
+		}
+	});
+}
+if ($("#news .newslist .news_lists span.mindate").length>0) {
+	$("#news .newslist .news_lists span.mindate").each(function(){
+		var text = $(this).attr('sctime');
+		var month = (new Date()).getMonth()+1;
+		var day = (new Date()).getDate();
+		if (day<10) {
+			day = '0'+day;
+		}
+
+		if (month<10) {
+			month = '0'+month;
+		}
+		if (text == month+'/'+day) {
+			$(this).html($(this).attr('todaytime'));
+		}
+	});
+}
+if ($("#pubs ul.news_lists span.mindate").length>0) {
+	$("#pubs ul.news_lists span.mindate").each(function(){
+		var text = $(this).attr('sctime');
+		var month = (new Date()).getMonth()+1;
+		var day = (new Date()).getDate();
+		if (day<10) {
+			day = '0'+day;
+		}
+
+		if (month<10) {
+			month = '0'+month;
+		}
+		if (text == month+'/'+day) {
+			$(this).html($(this).attr('todaytime'));
+		}
+	});
+}
+
+if ($(".info-cont #pub_new li").length>0) {
+	$(".info-cont #pub_new li").each(function(){
+		var text = $(this).attr('sctime');
+		var month = (new Date()).getMonth()+1;
+		var day = (new Date()).getDate();
+		if (day<10) {
+			day = '0'+day;
+		}
+
+		if (month<10) {
+			month = '0'+month;
+		}
+		if (text == month+'/'+day) {
+			$(this).find('span').html('<b>'+$(this).attr('todaytime')+'</b>');
+		}
+	});
+}

@@ -1,0 +1,44 @@
+@charset "gbk";
+#finance{z-index: 2;}
+.f_school{position: absolute;right: 16px;top: 2px;width: 94px;height: 25px;}
+.f_school_txt{display: block;width: 94px;height: 25px;background: url(http://i.thsi.cn/images/basic/stock/fschool/f_school.jpg) no-repeat;cursor: pointer;}
+.f_school_box{position: absolute;top: -224px;left: -552px;z-index: 2001;width: 516px;padding: 3px;border: 7px solid #292e34;background: #000;}
+.f_school_wrap{border: 1px solid #24292e;background: #292e34;}
+.f_school_wrap .f_school_hd{position: relative;}
+.f_school_hd h3{line-height: 48px;text-align: center;color: #f0f0f0;font-size: 24px;font-weight: 400;}
+.f_school_hd .close{position: absolute;right: 5px;top: 5px;width: 24px;height: 24px;line-height: 24px;color: #545b65;font-size: 22px;font-weight: 700;text-align: center;background: #111;cursor: pointer;}
+.f_school_bd{padding: 10px;background: #111;}
+.f_school_ft{padding: 0 10px;}
+.f_arr{position: absolute;right: -18px;top: 216px;width: 18px;height: 25px;background: url(http://i.thsi.cn/images/basic/stock/fschool/f_arr.jpg) no-repeat;}
+.flash_list{height: 332px;}
+.flash_list .item{float: left;}
+.flash_list .item .link{position: relative;display: block;width: 154px;margin-bottom: 22px;text-align: center;}
+.flash_list .item .link img{vertical-align: top;}
+.flash_list .item .link .flash_icon{position: absolute;top: 0;left: 0;width: 154px;height: 116px;background: url(http://i.thsi.cn/images/basic/stock/fschool/flash_icon.png) 50% 50% no-repeat;}
+.flash_list .item .link .title{line-height: 28px;color: #a6a6a6;}
+.flash_list .mid{margin: 0 16px;}
+.f_school_player{position: absolute;top: 0;left: -614px;width: 614px;z-index: 2001;}
+.f_school_player .f_school_wrap{border: 7px solid #292e34;}
+.f_school_player .f_school_hd{height: 34px;}
+.f_school_player .f_school_hd h3{float: left;height: 34px;line-height: 34px;font-size: 18px;text-align: left;color: #e4e4e4;}
+.f_school_player .f_school_hd .close{top: 0;right: 0;}
+.f_school_player .f_school_bd{padding: 5px;}
+.f_school_player .player,.f_school_player iframe{width: 590px;height: 485px;}
+.f_vote{float:right;width: 300px;margin-right: 30px;padding: 6px 0;height: 22px;line-height: 22px;text-align: center;color: #dadada;}
+.f_vote span{display: inline-block;line-height: 22px;padding-left: 23px;margin: 0 3px;color: #69727c;background: url(http://i.thsi.cn/images/basic/stock/fschool/f_school_icons.jpg) no-repeat;cursor: pointer;}
+.f_vote span.good, .f_vote span.good:hover{background-position: 0 0;}
+.f_vote span.bad, .f_vote span.bad:hover{background-position: 0 -28px;margin-left: 0;}
+.f_vote span.suggest, .f_vote span.suggest:hover{background-position: 0 -54px;}
+.f_intro{padding: 8px 0;color: #c1c1c1;line-height: 18px;}
+.f_intro .side{float: left;}
+.f_intro .section{overflow: hidden;}
+.f_school_postop{top: -9px;}
+.f_school_postop .f_arr{top: 2px;}
+.f_school_hd .opinion_opts_wraper{margin: 6px 30px 0 0;}
+.f_school .splpager{margin-top: 0;}
+.f_school .splpager .disabled{display: none;}
+.f_school .splpager li{margin: 0 6px;}
+.f_school .splpager span, .f_school .splpager a{margin-left: 0;background: #111;border: 1px solid #4e4e4e;color: #888;font-weight: 700;}
+.f_school .splpager .next, .f_school .splpager .next:hover,.f_school .splpager .prev, .f_school .splpager .prev:hover{border: none;background: none;}
+.f_school .splpager .active .current,.f_school .splpager .active .current:hover{background: #111;}
+.f_school .splpager a:hover,.f_school .splpager span:hover{color: #FFB400;}

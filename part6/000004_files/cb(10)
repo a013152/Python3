@@ -1,0 +1,1606 @@
+/*
+    json2.js
+    2015-05-03
+
+    Public Domain.
+
+    NO WARRANTY EXPRESSED OR IMPLIED. USE AT YOUR OWN RISK.
+
+    See http://www.JSON.org/js.html
+
+
+    This code should be minified before deployment.
+    See http://javascript.crockford.com/jsmin.html
+
+    USE YOUR OWN COPY. IT IS EXTREMELY UNWISE TO LOAD CODE FROM SERVERS YOU DO
+    NOT CONTROL.
+
+
+    This file creates a global JSON object containing two methods: stringify
+    and parse. This file is provides the ES5 JSON capability to ES3 systems.
+    If a project might run on IE8 or earlier, then this file should be included.
+    This file does nothing on ES5 systems.
+
+        JSON.stringify(value, replacer, space)
+            value       any JavaScript value, usually an object or array.
+
+            replacer    an optional parameter that determines how object
+                        values are stringified for objects. It can be a
+                        function or an array of strings.
+
+            space       an optional parameter that specifies the indentation
+                        of nested structures. If it is omitted, the text will
+                        be packed without extra whitespace. If it is a number,
+                        it will specify the number of spaces to indent at each
+                        level. If it is a string (such as '\t' or '&nbsp;'),
+                        it contains the characters used to indent at each level.
+
+            This method produces a JSON text from a JavaScript value.
+
+            When an object value is found, if the object contains a toJSON
+            method, its toJSON method will be called and the result will be
+            stringified. A toJSON method does not serialize: it returns the
+            value represented by the name/value pair that should be serialized,
+            or undefined if nothing should be serialized. The toJSON method
+            will be passed the key associated with the value, and this will be
+            bound to the value
+
+            For example, this would serialize Dates as ISO strings.
+
+                Date.prototype.toJSON = function (key) {
+                    function f(n) {
+                        // Format integers to have at least two digits.
+                        return n < 10 
+                            ? '0' + n 
+                            : n;
+                    }
+
+                    return this.getUTCFullYear()   + '-' +
+                         f(this.getUTCMonth() + 1) + '-' +
+                         f(this.getUTCDate())      + 'T' +
+                         f(this.getUTCHours())     + ':' +
+                         f(this.getUTCMinutes())   + ':' +
+                         f(this.getUTCSeconds())   + 'Z';
+                };
+
+            You can provide an optional replacer method. It will be passed the
+            key and value of each member, with this bound to the containing
+            object. The value that is returned from your method will be
+            serialized. If your method returns undefined, then the member will
+            be excluded from the serialization.
+
+            If the replacer parameter is an array of strings, then it will be
+            used to select the members to be serialized. It filters the results
+            such that only members with keys listed in the replacer array are
+            stringified.
+
+            Values that do not have JSON representations, such as undefined or
+            functions, will not be serialized. Such values in objects will be
+            dropped; in arrays they will be replaced with null. You can use
+            a replacer function to replace those with JSON values.
+            JSON.stringify(undefined) returns undefined.
+
+            The optional space parameter produces a stringification of the
+            value that is filled with line breaks and indentation to make it
+            easier to read.
+
+            If the space parameter is a non-empty string, then that string will
+            be used for indentation. If the space parameter is a number, then
+            the indentation will be that many spaces.
+
+            Example:
+
+            text = JSON.stringify(['e', {pluribus: 'unum'}]);
+            // text is '["e",{"pluribus":"unum"}]'
+
+
+            text = JSON.stringify(['e', {pluribus: 'unum'}], null, '\t');
+            // text is '[\n\t"e",\n\t{\n\t\t"pluribus": "unum"\n\t}\n]'
+
+            text = JSON.stringify([new Date()], function (key, value) {
+                return this[key] instanceof Date 
+                    ? 'Date(' + this[key] + ')' 
+                    : value;
+            });
+            // text is '["Date(---current time---)"]'
+
+
+        JSON.parse(text, reviver)
+            This method parses a JSON text to produce an object or array.
+            It can throw a SyntaxError exception.
+
+            The optional reviver parameter is a function that can filter and
+            transform the results. It receives each of the keys and values,
+            and its return value is used instead of the original value.
+            If it returns what it received, then the structure is not modified.
+            If it returns undefined then the member is deleted.
+
+            Example:
+
+            // Parse the text. Values that look like ISO date strings will
+            // be converted to Date objects.
+
+            myData = JSON.parse(text, function (key, value) {
+                var a;
+                if (typeof value === 'string') {
+                    a =
+/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*)?)Z$/.exec(value);
+                    if (a) {
+                        return new Date(Date.UTC(+a[1], +a[2] - 1, +a[3], +a[4],
+                            +a[5], +a[6]));
+                    }
+                }
+                return value;
+            });
+
+            myData = JSON.parse('["Date(09/09/2001)"]', function (key, value) {
+                var d;
+                if (typeof value === 'string' &&
+                        value.slice(0, 5) === 'Date(' &&
+                        value.slice(-1) === ')') {
+                    d = new Date(value.slice(5, -1));
+                    if (d) {
+                        return d;
+                    }
+                }
+                return value;
+            });
+
+
+    This is a reference implementation. You are free to copy, modify, or
+    redistribute.
+*/
+
+/*jslint 
+    eval, for, this 
+*/
+
+/*property
+    JSON, apply, call, charCodeAt, getUTCDate, getUTCFullYear, getUTCHours,
+    getUTCMinutes, getUTCMonth, getUTCSeconds, hasOwnProperty, join,
+    lastIndex, length, parse, prototype, push, replace, slice, stringify,
+    test, toJSON, toString, valueOf
+*/
+
+
+// Create a JSON object only if one does not already exist. We create the
+// methods in a closure to avoid creating global variables.
+
+if (typeof JSON !== 'object') {
+    JSON = {};
+}
+
+(function () {
+    'use strict';
+    
+    var rx_one = /^[\],:{}\s]*$/,
+        rx_two = /\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g,
+        rx_three = /"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g,
+        rx_four = /(?:^|:|,)(?:\s*\[)+/g,
+        rx_escapable = /[\\\"\u0000-\u001f\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
+        rx_dangerous = /[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g;
+
+    function f(n) {
+        // Format integers to have at least two digits.
+        return n < 10 
+            ? '0' + n 
+            : n;
+    }
+    
+    function this_value() {
+        return this.valueOf();
+    }
+
+    if (typeof Date.prototype.toJSON !== 'function') {
+
+        Date.prototype.toJSON = function () {
+
+            return isFinite(this.valueOf())
+                ? this.getUTCFullYear() + '-' +
+                        f(this.getUTCMonth() + 1) + '-' +
+                        f(this.getUTCDate()) + 'T' +
+                        f(this.getUTCHours()) + ':' +
+                        f(this.getUTCMinutes()) + ':' +
+                        f(this.getUTCSeconds()) + 'Z'
+                : null;
+        };
+
+        Boolean.prototype.toJSON = this_value;
+        Number.prototype.toJSON = this_value;
+        String.prototype.toJSON = this_value;
+    }
+
+    var gap,
+        indent,
+        meta,
+        rep;
+
+
+    function quote(string) {
+
+// If the string contains no control characters, no quote characters, and no
+// backslash characters, then we can safely slap some quotes around it.
+// Otherwise we must also replace the offending characters with safe escape
+// sequences.
+
+        rx_escapable.lastIndex = 0;
+        return rx_escapable.test(string) 
+            ? '"' + string.replace(rx_escapable, function (a) {
+                var c = meta[a];
+                return typeof c === 'string'
+                    ? c
+                    : '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
+            }) + '"' 
+            : '"' + string + '"';
+    }
+
+
+    function str(key, holder) {
+
+// Produce a string from holder[key].
+
+        var i,          // The loop counter.
+            k,          // The member key.
+            v,          // The member value.
+            length,
+            mind = gap,
+            partial,
+            value = holder[key];
+
+// If the value has a toJSON method, call it to obtain a replacement value.
+
+        if (value && typeof value === 'object' &&
+                typeof value.toJSON === 'function') {
+            value = value.toJSON(key);
+        }
+
+// If we were called with a replacer function, then call the replacer to
+// obtain a replacement value.
+
+        if (typeof rep === 'function') {
+            value = rep.call(holder, key, value);
+        }
+
+// What happens next depends on the value's type.
+
+        switch (typeof value) {
+        case 'string':
+            return quote(value);
+
+        case 'number':
+
+// JSON numbers must be finite. Encode non-finite numbers as null.
+
+            return isFinite(value) 
+                ? String(value) 
+                : 'null';
+
+        case 'boolean':
+        case 'null':
+
+// If the value is a boolean or null, convert it to a string. Note:
+// typeof null does not produce 'null'. The case is included here in
+// the remote chance that this gets fixed someday.
+
+            return String(value);
+
+// If the type is 'object', we might be dealing with an object or an array or
+// null.
+
+        case 'object':
+
+// Due to a specification blunder in ECMAScript, typeof null is 'object',
+// so watch out for that case.
+
+            if (!value) {
+                return 'null';
+            }
+
+// Make an array to hold the partial results of stringifying this object value.
+
+            gap += indent;
+            partial = [];
+
+// Is the value an array?
+
+            if (Object.prototype.toString.apply(value) === '[object Array]') {
+
+// The value is an array. Stringify every element. Use null as a placeholder
+// for non-JSON values.
+
+                length = value.length;
+                for (i = 0; i < length; i += 1) {
+                    partial[i] = str(i, value) || 'null';
+                }
+
+// Join all of the elements together, separated with commas, and wrap them in
+// brackets.
+
+                v = partial.length === 0
+                    ? '[]'
+                    : gap
+                        ? '[\n' + gap + partial.join(',\n' + gap) + '\n' + mind + ']'
+                        : '[' + partial.join(',') + ']';
+                gap = mind;
+                return v;
+            }
+
+// If the replacer is an array, use it to select the members to be stringified.
+
+            if (rep && typeof rep === 'object') {
+                length = rep.length;
+                for (i = 0; i < length; i += 1) {
+                    if (typeof rep[i] === 'string') {
+                        k = rep[i];
+                        v = str(k, value);
+                        if (v) {
+                            partial.push(quote(k) + (
+                                gap 
+                                    ? ': ' 
+                                    : ':'
+                            ) + v);
+                        }
+                    }
+                }
+            } else {
+
+// Otherwise, iterate through all of the keys in the object.
+
+                for (k in value) {
+                    if (Object.prototype.hasOwnProperty.call(value, k)) {
+                        v = str(k, value);
+                        if (v) {
+                            partial.push(quote(k) + (
+                                gap 
+                                    ? ': ' 
+                                    : ':'
+                            ) + v);
+                        }
+                    }
+                }
+            }
+
+// Join all of the member texts together, separated with commas,
+// and wrap them in braces.
+
+            v = partial.length === 0
+                ? '{}'
+                : gap
+                    ? '{\n' + gap + partial.join(',\n' + gap) + '\n' + mind + '}'
+                    : '{' + partial.join(',') + '}';
+            gap = mind;
+            return v;
+        }
+    }
+
+// If the JSON object does not yet have a stringify method, give it one.
+
+    if (typeof JSON.stringify !== 'function') {
+        meta = {    // table of character substitutions
+            '\b': '\\b',
+            '\t': '\\t',
+            '\n': '\\n',
+            '\f': '\\f',
+            '\r': '\\r',
+            '"': '\\"',
+            '\\': '\\\\'
+        };
+        JSON.stringify = function (value, replacer, space) {
+
+// The stringify method takes a value and an optional replacer, and an optional
+// space parameter, and returns a JSON text. The replacer can be a function
+// that can replace values, or an array of strings that will select the keys.
+// A default replacer method can be provided. Use of the space parameter can
+// produce text that is more easily readable.
+
+            var i;
+            gap = '';
+            indent = '';
+
+// If the space parameter is a number, make an indent string containing that
+// many spaces.
+
+            if (typeof space === 'number') {
+                for (i = 0; i < space; i += 1) {
+                    indent += ' ';
+                }
+
+// If the space parameter is a string, it will be used as the indent string.
+
+            } else if (typeof space === 'string') {
+                indent = space;
+            }
+
+// If there is a replacer, it must be a function or an array.
+// Otherwise, throw an error.
+
+            rep = replacer;
+            if (replacer && typeof replacer !== 'function' &&
+                    (typeof replacer !== 'object' ||
+                    typeof replacer.length !== 'number')) {
+                throw new Error('JSON.stringify');
+            }
+
+// Make a fake root object containing our value under the key of ''.
+// Return the result of stringifying the value.
+
+            return str('', {'': value});
+        };
+    }
+
+
+// If the JSON object does not yet have a parse method, give it one.
+
+    if (typeof JSON.parse !== 'function') {
+        JSON.parse = function (text, reviver) {
+
+// The parse method takes a text and an optional reviver function, and returns
+// a JavaScript value if the text is a valid JSON text.
+
+            var j;
+
+            function walk(holder, key) {
+
+// The walk method is used to recursively walk the resulting structure so
+// that modifications can be made.
+
+                var k, v, value = holder[key];
+                if (value && typeof value === 'object') {
+                    for (k in value) {
+                        if (Object.prototype.hasOwnProperty.call(value, k)) {
+                            v = walk(value, k);
+                            if (v !== undefined) {
+                                value[k] = v;
+                            } else {
+                                delete value[k];
+                            }
+                        }
+                    }
+                }
+                return reviver.call(holder, key, value);
+            }
+
+
+// Parsing happens in four stages. In the first stage, we replace certain
+// Unicode characters with escape sequences. JavaScript handles many characters
+// incorrectly, either silently deleting them, or treating them as line endings.
+
+            text = String(text);
+            rx_dangerous.lastIndex = 0;
+            if (rx_dangerous.test(text)) {
+                text = text.replace(rx_dangerous, function (a) {
+                    return '\\u' +
+                            ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
+                });
+            }
+
+// In the second stage, we run the text against regular expressions that look
+// for non-JSON patterns. We are especially concerned with '()' and 'new'
+// because they can cause invocation, and '=' because it can cause mutation.
+// But just to be safe, we want to reject all unexpected forms.
+
+// We split the second stage into 4 regexp operations in order to work around
+// crippling inefficiencies in IE's and Safari's regexp engines. First we
+// replace the JSON backslash pairs with '@' (a non-JSON character). Second, we
+// replace all simple value tokens with ']' characters. Third, we delete all
+// open brackets that follow a colon or comma or that begin the text. Finally,
+// we look to see that the remaining characters are only whitespace or ']' or
+// ',' or ':' or '{' or '}'. If that is so, then the text is safe for eval.
+
+            if (
+                rx_one.test(
+                    text
+                        .replace(rx_two, '@')
+                        .replace(rx_three, ']')
+                        .replace(rx_four, '')
+                )
+            ) {
+
+// In the third stage we use the eval function to compile the text into a
+// JavaScript structure. The '{' operator is subject to a syntactic ambiguity
+// in JavaScript: it can begin a block or an object literal. We wrap the text
+// in parens to eliminate the ambiguity.
+
+                j = eval('(' + text + ')');
+
+// In the optional fourth stage, we recursively walk the new structure, passing
+// each name/value pair to a reviver function for possible transformation.
+
+                return typeof reviver === 'function'
+                    ? walk({'': j}, '')
+                    : j;
+            }
+
+// If the text is not JSON parseable, then a SyntaxError is thrown.
+
+            throw new SyntaxError('JSON.parse');
+        };
+    }
+}());
+//@charset "utf-8";
+/**
+ * 键盘精灵
+ * author: huaxiaolong
+ * date: 2012-05-16 13:07
+ * update : 2013-07-29 16:46
+ * 修复容器的定位功能
+ * 新增容器的宽度自适应功能
+ * 新增配置参数stock=股票搜索,fund=基金搜索,extra=社区等搜索
+ * update : 2013-08-02 11:21
+ * 新增地址跳转方式参数window,new=打开新窗口,self=当前页面
+ * 新增跳转地址格式urlPattern
+ * 新增字符串格式化方法$.format
+ * 新增回车发送统计代码statid
+ * update : 2013-11-19 12:16
+ * 输入内容间隔一定时间才触发事件
+ * 保存历史记录减少请求次数
+ * update : 2013-12-26 18:21
+ * 代码重构，可配置指数类型
+ * 支持点击，回车方法绑定，支持提交搜索按钮方法绑定
+ * update : 2014-07-02
+ * 增加港股支持，修改了可配置参数
+ * update : 2015-6-29
+ *
+ */
+(function($) {
+	$.format = function(source, params) {
+		if (arguments.length == 1) return function() {
+			var args = $.makeArray(arguments);
+			args.unshift(source);
+			return $.format.apply(this, args);
+		};
+		if (arguments.length > 2 && params.constructor != Array) {
+			params = $.makeArray(arguments).slice(1);
+		}
+		if (params.constructor != Array) {
+			params = [params];
+		}
+		$.each(params, function(i, n) {
+			source = source.replace(new RegExp("\\{" + i + "\\}", "g"), n);
+		});
+		return source;
+	};
+	$.fn.autocomplete = function(options) {
+		var opt = {
+			isSpeech : false,
+			container : [],
+			data : [],
+			valueList : [],
+			boxList : [],
+			type : [],
+			extra : true,
+			text : null,
+			count : 5,
+			index : 0,
+			input : null,
+			window : 'new',
+			urlPattern : null,
+			displaycode : true
+		};
+		var typeList = ['fund', 'stock', 'company', 'field', 'concept', 'area', 'hk', 'yyb', 'xxgn', 'usa','F10'];
+		var typeInfo = {
+			'fund' : {
+				name : '\u57FA\u91D1',
+				mark : 0
+			},
+			'stock' : {
+				name : '\u80A1\u7968',
+				mark : 1
+			},
+			'company' : {
+				name : '\u57FA\u91D1\u516C\u53F8',
+				mark : 2
+			},
+			'field' : {
+				name : '\u884C\u4E1A',
+				mark : 3
+			},
+			'concept' : {
+				name : '\u6982\u5FF5',
+				mark : 4
+			},
+			'area' : {
+				name : '\u5730\u57DF',
+				mark : 5
+			},
+			'hk' : {
+				name : '\u6E2F\u80A1',
+				mark : 6
+			},
+			'yyb' : {
+				name : '\u8425\u4E1A\u90E8',
+				mark : 7
+			},
+			'yyb' : {
+				name : '新兴概念',
+				mark : 8
+			},
+			'usa' : {
+				name : '美股',
+				mark : 9
+			},
+			'f10' : {
+				name : 'f10',
+				mark : 10
+			}
+		};
+		var prefix = 'autocomplete';
+
+		var init = function(self) {
+			var defaultType = {
+				stock: true,
+				hk: true,
+				fund: true,
+				usa:true
+			};
+			for (var a in options) {
+	            if (options[a] != null) {
+	            	if (typeInfo[a]) {
+	            		defaultType[a] = options[a];
+	            	} else {
+	            		opt[a] = options[a]
+	            	}
+	            }
+	        }
+			for (var a in defaultType) {
+	        	if (defaultType[a]) {
+	        		opt.type.push(a);
+	        	}
+	        }
+	        opt.input = self;
+	        $("#" + prefix + "_" + self.id).remove();
+	        opt.container[self.id] = $("<div>").addClass("autocomplete").attr("id", prefix + "_" + self.id).hide().css({"z-index":parseInt(new Date().getTime() / 1000),"position":"fixed"}).appendTo($("body"));
+			$(self).attr("autocomplete", "off");
+			var $container = opt.container[self.id];
+			if (opt.width) {
+				$container.width(opt.width);
+			} else {
+				$container.outerWidth(Math.max($container.width("").outerWidth() + 1, $(self).outerWidth()));
+			}
+			if (opt.func) {
+				$.each(opt.func, function(i, func){
+					if (typeof(func) == 'object') {
+						func.bindFunc($container, self)
+					}
+				})
+			}
+			if (self.webkitSpeech != undefined) {
+				opt.isSpeech = true
+			}
+		};
+
+		var clean = function() {
+			var self = opt.input;
+			opt.container[self.id].hide();
+		};
+
+		var showList = function() {
+			var self = opt.input;
+			opt.container[self.id].show();
+		}
+		var setIndex = function(index) {
+			var self = opt.input;
+			var $div = opt.container[self.id];
+			var total = $div.find('dd').size() + $div.find('dt').size();
+			if (index < 1 || index > total) {
+				return;
+			}
+			opt.index = index;
+			var $target = $div.find(".auto-item[did='" + index + "']");
+			$div.find('dd,dt').removeClass('selected');
+			$target.addClass('selected');
+			$div.show();
+		};
+
+		var talog = function() {
+			if (opt.statid && window.TA) {
+				TA.log({
+					id : opt.statid,
+					nj : 1,
+					_sid : 'img_' + opt.statid
+				});
+			}
+		};
+
+		var redirect = function(url) {
+			if (opt.window == 'self') {
+				window.location.href = url
+			}
+			if (opt.window == 'new') {
+				window.open(url)
+			}
+		};
+
+		var submit = function() {
+			var text = opt.text,
+			encodeText = encodeURIComponent(text),
+			self = opt.input,
+			index = opt.index,
+			defaultText = self.defaultValue,
+			$div = opt.container[self.id];
+			talog();
+			if (!opt.stype || !opt.scode) {
+				//解析index
+				var $target = $div.find(".auto-item[did='" + index + "']");
+				if ($target) {
+					opt.stype = $target.parent().attr('data-type');
+					if ($target[0].nodeName.toUpperCase() == 'DD') {
+						opt.scode = $target.attr('data-code');
+						opt.spy = $target.attr('data-py');
+					}
+				}
+			}
+			if(opt.type.length == 1 && opt.type[0] == 'f10'){
+				var $target = $div.find(".auto-item[did='" + index + "']");
+				if ($target && !$div.is(':hidden')) {
+					$target.trigger('click');
+				}else{
+					var url = 'http://www.iwencai.com/stockpick/search?typed=1&preParams=&ts=1&f=1&qs=f10stock_query&selfsectsn=&querytype=&searchfilter=&tid=stockpick&w='+encodeText;
+					openbrower(url);
+				}
+				return false;
+			}
+			if (opt.clickFunc) {
+				$.each(opt.clickFunc, function(i, func){
+					if (typeof(func) == 'object' && opt.scode) {
+						func.run(opt.scode, opt)
+					}
+				})
+				return
+			}
+			if (text == '' || text == defaultText) {
+				redirect('http://search.10jqka.com.cn');
+				return
+			}
+			if (!opt.stype) {
+				return
+			}
+			switch (opt.stype) {
+				case 'blog' :
+					redirect("http://search.10jqka.com.cn/search?tid=blog&qs=box_ths&w=" + encodeText);
+					break;
+				case 'forum' :
+					redirect("http://search.10jqka.com.cn/search?tid=forum&qs=box_ths&w=" + encodeText);
+					break;
+				case 'news' :
+					redirect("http://search.10jqka.com.cn/search?tid=news&qs=box_ths&w=" + encodeText);
+					break;
+				case 'stock' :
+					if (opt.scode) {
+						var url = "http://stockpage.10jqka.com.cn/" + opt.scode + "/";
+						if (opt.urlPattern && opt.urlPattern['stock']) {
+							url = $.format(opt.urlPattern['stock'], opt.scode)
+						}
+						redirect(url)
+					}
+					break;
+				case 'fund' :
+					if (opt.scode) {
+						var url = "http://fund.10jqka.com.cn/" + opt.scode + "/";
+						if (opt.urlPattern && opt.urlPattern['fund']) {
+							url = $.format(opt.urlPattern['fund'], opt.scode)
+						}
+						redirect(url)
+					}
+					break;
+				case 'hk' :
+					if (opt.scode) {
+						var url = "http://stockpage.10jqka.com.cn/HK" + opt.scode.substr(1,4) + "/";
+						if (opt.urlPattern && opt.urlPattern['hk']) {
+							url = $.format(opt.urlPattern['hk'], opt.scode)
+						}
+						redirect(url)
+					}
+					break;
+				case 'company' :
+					if (opt.scode) {
+						var url = "http://fund.10jqka.com.cn/company/" + opt.scode + "/";
+						if (opt.urlPattern && opt.urlPattern['company']) {
+							url = $.format(opt.urlPattern['company'], opt.scode)
+						}
+						redirect(url)
+					}
+					break;
+				case 'field' :
+					if (opt.spy) {
+						var url = "http://q.10jqka.com.cn/stock/thshy/" + opt.spy + "/";
+						if (opt.urlPattern && opt.urlPattern['field']) {
+							url = $.format(opt.urlPattern['field'], opt.spy)
+						}
+						redirect(url)
+					}
+					break;
+				case 'concept' :
+					if (opt.spy) {
+						var url = "http://q.10jqka.com.cn/stock/gn/" + opt.spy + "/";
+						if (opt.urlPattern && opt.urlPattern['concept']) {
+							url = $.format(opt.urlPattern['concept'], opt.spy)
+						}
+						redirect(url)
+					}
+					break;
+				case 'area' :
+					if (opt.spy) {
+						var url = "http://q.10jqka.com.cn/stock/dy/" + opt.spy + "/";
+						if (opt.urlPattern && opt.urlPattern['area']) {
+							url = $.format(opt.urlPattern['area'], opt.spy)
+						}
+						redirect(url)
+					}
+					break;
+				case 'usa' :
+					if (opt.scode) {
+						var url = "http://stockpage.10jqka.com.cn/" + opt.scode + "/";
+						if (opt.urlPattern && opt.urlPattern['usa']) {
+							url = $.format(opt.urlPattern['usa'], opt.scode)
+						}
+						redirect(url)
+					}
+					break;
+				default:
+					break;
+			}
+			opt.stype = null;
+			opt.scode = null;
+			opt.spy = null;
+		};
+
+		var enter = function () {
+			var self = opt.input,
+				$div = opt.container[self.id],
+				$target = $div.find('dd.selected').eq(0);
+			opt.stype = $target.parent().attr('data-type');
+			opt.scode = null;
+			opt.spy = null;
+			if ($target[0].nodeName.toUpperCase() == 'DD') {
+				opt.scode = $target.attr('data-code');
+				opt.spy = $target.attr('data-py');
+			}
+			submit()
+		};
+
+		var bindEvent = function() {
+			var self = opt.input,
+				$div = opt.container[self.id];
+			$div.find('.auto-item').each(function(index, el) {
+				$(this).attr('did', index + 1);
+			});
+			$div.find('dd').each(function(index, el) {
+				$(this).mouseover(function(event) {
+					$div.find('dd,dt').removeClass('selected');
+					$(this).addClass('selected')
+				});
+			});
+			$div.find('dt').each(function(index, el) {
+				$(this).mouseover(function(event) {
+					$div.find('dd,dt').removeClass('selected');
+					$(this).addClass('selected')
+				});
+			});
+			if(opt.type.length == 1 && opt.type[0] == 'f10'){
+				return false;
+			}
+			$div.find('dd,dt').each(function(index, el) {
+				$(this).click(function(event) {
+					opt.stype = $(event.target).parent().attr('data-type');
+					opt.scode = null;
+					opt.spy = null;
+					if (event.target.nodeName.toUpperCase() == 'DD') {
+						opt.scode = $(event.target).attr('data-code');
+						opt.spy = $(event.target).attr('data-py');
+					}
+					submit()
+				});
+			});
+		};
+
+		var render = function(data) {
+			var self = opt.input,
+				type = opt.type,
+				$div = opt.container[self.id],
+				$box = [];
+			for (var i = 0; i < type.length; i++) {
+				$box[type[i]] = $("<dl data-type='" + type[i] + "'><dt class='auto-item'>\u641C\"<strong></strong>\"\u76F8\u5173" + typeInfo[type[i]].name + "</dt></dl>");
+			}
+			$.each(data, function(keyData, items) {
+				if (items instanceof Array) {
+					opt.data[keyData] = [];
+					$.each(items, function(key, item) {
+						opt.data[keyData][key] = item.split("||");
+						var codeInfo = opt.data[keyData][key][1].split(" "),
+							mark = opt.data[keyData][key][0];
+						if (typeof (codeInfo[3]) != 'undefined') {
+							$("<dd class='auto-item' data-code='" + codeInfo[0] + "' data-py='" + codeInfo[2] + "'></dd>").append("<span>" + (opt.displaycode ? codeInfo[0] : '') + "</span>" + codeInfo[1]).appendTo($box[typeList[mark]]);
+						} else {
+							$("<dd class='auto-item' data-code='" + codeInfo[0] + "'></dd>").append("<span>" + (opt.displaycode ? codeInfo[0] : '') + "</span>" + codeInfo[1]).appendTo($box[typeList[mark]]);
+						}
+					});
+				} else {
+					opt.data[keyData] = items.split("||");
+					var codeInfo = opt.data[keyData][1].split(" "),
+						mark = opt.data[keyData][0];
+					if (typeof (codeInfo[3]) != 'undefined') {
+						$("<dd class='auto-item' data-code='" + codeInfo[0] + "' data-py='" + codeInfo[2] + "'></dd>").append("<span>" + (opt.displaycode ? codeInfo[0] : '') + "</span>" + codeInfo[1]).appendTo($box[typeList[mark]]);
+					} else {
+						$("<dd class='auto-item' data-code='" + codeInfo[0] + "'></dd>").append("<span>" + (opt.displaycode ? codeInfo[0] : '') + "</span>" + codeInfo[1]).appendTo($box[typeList[mark]]);
+					}
+				}
+			});
+
+
+			$div.empty();
+			for (a in $box) {
+				$div.append($box[a])
+			}
+			if (opt.extra) {
+				$("<dl data-type='news'><dt class='auto-item'>\u641C\"<strong></strong>\"\u76F8\u5173\u65B0\u95FB&gt;&gt;</dt></dl>").appendTo($div);
+				$("<dl data-type='forum'><dt class='auto-item'>\u641C\"<strong></strong>\"\u76F8\u5173\u8BBA\u575B&gt;&gt;</dt></dl>").appendTo($div);
+				$("<dl data-type='blog'><dt class='auto-item'>\u641C\"<strong></strong>\"\u76F8\u5173\u535A\u5BA2&gt;&gt;</dt></dl>").appendTo($div)
+			}
+			$div.find('strong').each(function() {
+				$(this).html(opt.text)
+			});
+			bindEvent();
+			setIndex(2);
+		};
+
+		var show = function() {
+			var self = opt.input;
+			var newtype = opt.type;
+			opt.data = [];
+			if (opt.isSpeech) {
+				opt.text = self.value
+			}
+			if (opt.valueList[opt.text]) {
+				render(opt.valueList[opt.text])
+			} else {
+				if (opt.type == 1) {
+					newtype = 0;//类型为1的时候，当做0全量获取数据
+				}
+				/*if(opt.type.length == 1 && opt.type[0] == 'f10'){
+					showRecommendQuery();
+					return false;
+				}*/
+				$.ajax({
+					url: 'http://news.10jqka.com.cn/public/index_keyboard_' + encodeURIComponent(opt.text) + '_' + newtype + '_' + opt.count + '_jsonp.html',
+					type: 'GET',
+					dataType: 'jsonp',
+					jsonpCallback: 'jsonp',
+					jsonp: false,
+					cache: true
+				}).done(function(json) {
+					opt.valueList[opt.text] = json;
+					render(json)
+				})
+			}
+		};
+
+		var showRecommendQuery = function (showtype){
+			clean();
+			var txt = '';
+			if(encodeURIComponent(opt.text) != 'null'){
+				txt = encodeURIComponent(opt.text);
+			}
+			if (txt == '') {
+				txt = 'isnulltxt';
+			}
+			sendTalog('f10_stock_searchinput_click');
+			$.ajax({
+				url: 'http://basic.10jqka.com.cn/api/stock/searchForWord/' + txt + '/' + $('#stockCode').val()+'/no/',
+				type: 'GET',
+				dataType: 'json',
+				cache: true,
+				timeout : 500, //超时时间设置，单位毫秒
+				success: function(jsonp){
+					var dataList = jsonp;
+					var self = opt.input,
+						type = opt.type,
+						$div = opt.container[self.id],
+						$box = $('<dl data-type="f10"></dl>');
+					if(showtype == 'default'){//默认语句
+						for(var i = 0;i < dataList.length; i++){
+							var dataUrl = dataList[i].url;
+							if(dataList[i].type == 'f10') {
+								var infoArr = dataUrl.split('|');
+								var code = infoArr[0];
+								var block = infoArr[1];
+								dataUrl = 'http://basic.10jqka.com.cn/' + code + '/' + block;
+								if(i < 3){
+									$('<dd did="' + (i+1) + '" jumptype="f10" code="' + code +'" block="' + block +'" class="auto-item" data-url="' + dataUrl + '" data-type="f10"></dd>').append('<i class="icona">' + (i+1) + '</i><span>' + dataList[i].name + '</span>').appendTo($box);
+								}else{
+									$('<dd did="' + (i+1) + '" jumptype="f10"code="' + code +'" block="' + block +'" class="auto-item" data-url="' + dataUrl + '" data-type="f10"></dd>').append('<i class="iconb">' + (i+1) + '</i><span>' + dataList[i].name + '</span>').appendTo($box);
+								}
+							}else{
+								if(i < 3){
+									$('<dd did="' + (i+1) + '" jumptype="iwc" class="auto-item" data-url="' + dataUrl + '" data-type=""></dd>').append('<i class="icona">' + (i+1) + '</i><span>' + dataList[i].name + '</span>').appendTo($box);
+								}else{
+									$('<dd did="' + (i+1) + '" jumptype="iwc" class="auto-item" data-url="' + dataUrl + '" data-type=""></dd>').append('<i class="iconb">' + (i+1) + '</i><span>' + dataList[i].name + '</span>').appendTo($box);
+								}
+							}
+						}
+					}else if(getCookie('searchHistory') && self.value.length == 0){//用户搜索历史
+						var temp = getCookie('searchHistory');
+						if(temp != ''){
+							var historyArr = JSON.parse(getCookie('searchHistory'));
+							for(var i = 0;i < historyArr.length; i++){
+								var dataUrl = historyArr[i].url;
+								var code = historyArr[i].code;
+								var block = historyArr[i].block;
+								var title = historyArr[i].title;
+								var jumptype = historyArr[i].jumptype;
+								if(jumptype == 'f10'){
+									if(i < 3){
+										$('<dd did="' + (i+1) + '" jumptype="f10" code="' + code +'" block="' + block +'" class="auto-item" data-url="' + dataUrl + '" data-type="f10"></dd>').append('<i class="icona">' + (i+1) + '</i><span>' + title + '</span>').appendTo($box);
+									}else{
+										$('<dd did="' + (i+1) + '" jumptype="f10" code="' + code +'" block="' + block +'" class="auto-item" data-url="' + dataUrl + '" data-type="f10"></dd>').append('<i class="iconb">' + (i+1) + '</i><span>' + title + '</span>').appendTo($box);
+									}
+								}else{
+									if(i < 3){
+										$('<dd did="' + (i+1) + '" jumptype="iwc" code="' + code +'" block="' + block +'" class="auto-item" data-url="' + dataUrl + '" data-type=""></dd>').append('<i class="icona">' + (i+1) + '</i><span>' + title + '</span>').appendTo($box);
+									}else{
+										$('<dd did="' + (i+1) + '" jumptype="iwc" code="' + code +'" block="' + block +'" class="auto-item" data-url="' + dataUrl + '" data-type=""></dd>').append('<i class="iconb">' + (i+1) + '</i><span>' + title + '</span>').appendTo($box);
+									}
+								}
+
+							}
+							$('<p style="height: 20px;"><a class="clean-txt" href="###">\u6e05\u9664\u8bb0\u5f55</a></p>').appendTo($box);
+							setTimeout(function(){
+								$('#autocomplete_search_input .clean-txt').one('click',function(){
+									cleanHistory();
+								});
+							},200);
+						}
+					}else if (self.value.length > 0) {//按用户输入显示语句
+						$box = $('<dl data-type="f10" class="sty"></dl>');
+						for(var i = 0;i < dataList.length; i++){
+							var userValue = self.value;
+							var dataValue = dataList[i].name;
+							var dataUrl = dataList[i].url;
+							if(dataValue.indexOf(userValue) > -1){
+								dataValue = dataValue.replace(userValue,'<span class="ylw">' + userValue + '</span>');
+							}
+							if(dataList[i].type == 'f10') {
+								var infoArr = dataUrl.split('|');
+								var code = infoArr[0];
+								var block = infoArr[1];
+								dataUrl = 'http://basic.10jqka.com.cn/' + code + '/' + block;
+								if(i < 3){
+									$('<dd did="' + (i+1) + '" jumptype="f10" code="' + code +'" block="' + block +'" class="auto-item" data-url="' + dataUrl + '" data-type="f10"></dd>').append('<span>' + dataValue + '</span>').appendTo($box);
+								}else{
+									$('<dd did="' + (i+1) + '" jumptype="f10" code="' + code +'" block="' + block +'" class="auto-item" data-url="' + dataUrl + '" data-type="f10"></dd>').append('<span>' + dataValue + '</span>').appendTo($box);
+								}
+							}else{
+								if(i < 3){
+									$('<dd did="' + (i+1) + '" jumptype="iwc" class="auto-item" data-url="' + dataUrl + '" data-type=""></dd>').append('<span>' + dataValue + '</span>').appendTo($box);
+								}else{
+									$('<dd did="' + (i+1) + '" jumptype="iwc" class="auto-item" data-url="' + dataUrl + '" data-type=""></dd>').append('<span>' + dataValue + '</span>').appendTo($box);
+								}
+							}
+						};
+					}
+					opt.text = '';
+					$div.empty();
+					$div.append($('<div class="bd"></div>').append($box));
+					$div.append($('<div class="ft"></div>'));
+					//showList();
+
+					bindEvent();
+					setIndex(1);
+				},
+				complete : function(XMLHttpRequest,status) { //请求完成后最终执行参数
+					if(status=='timeout') {//超时,status还有success,error等值的情况
+						if($('#f10ajax').length < 1){
+							$('body').append($('<input id="f10ajax"  type="hidden" value="empty">'));
+							showRecommendQuery(showtype);
+						}
+					}
+				}
+			});
+
+		}
+
+		this.each(function() {
+			var self = this,
+				requestTimer = 0,
+				focus = false;
+			init(self);
+			if (opt.isSpeech) {
+				self.onwebkitspeechchange = function() {
+					show()
+				}
+			}
+			$(self).focus(function() {
+				//只定位一次abccccccccccccc
+				//if (!focus) {
+					/*opt.container[self.id].position($.extend({
+						of: $(self)
+					}, {
+						my: "left top",
+						at: "left bottom",
+						collision: "none"
+					}));*/
+					var _wp = $(".wrapper").outerWidth();
+					var _wd = $(window).width();
+					var _icon = $(".tips-icon").outerWidth()+4;
+					var _left = parseFloat($(self).offset().left);
+					$(opt.container[self.id]).css({
+						left:_left,
+						display:"block",
+						top:"158px"
+					});
+				//}
+				focus = true;
+				if(focus){
+					if(opt.type.length == 1 && opt.type[0] == 'f10'){
+						
+						if(self.value == self.defaultValue || ($("#defaultcontent").length>0 && self.value == $("#defaultcontent").val())){
+							showRecommendQuery('default');
+						}else{
+							showRecommendQuery();
+						}
+						/*if(true){
+							showRecommendQuery('default');
+						}*/
+						self.value = '';
+					}
+				}
+
+			}).keyup(function(event) {
+				opt.text = self.value;
+				var length = opt.text.length,
+					keycode = event.keyCode,
+					index = opt.index;
+				if (keycode > 40 || keycode == 8 || keycode == 32) {
+					if(opt.type.length == 1 && opt.type[0] == 'f10'){
+						if (length > 0 && length < 20) {
+							if (requestTimer == 0) {
+								//延迟100毫秒请求接口abccccccccccccccc
+								requestTimer = setTimeout(function() {
+									showRecommendQuery();
+								}, 100)
+							}
+						} else {
+							clean()
+						}
+					}else {
+						if (length > 0 && length < 8) {
+							if (requestTimer == 0) {
+								//延迟100毫秒请求接口abccccccccccccccc
+								requestTimer = setTimeout(function() {
+									show()
+								}, 100)
+							}
+						} else {
+							clean()
+						}
+					}
+				} else if (index !== null) {
+					if (keycode == 38) {
+						setIndex(index - 1)
+					} else if (keycode == 40) {
+						setIndex(index + 1)
+					} else if (keycode == 27) {
+						setIndex(0)
+					} else if (keycode == 13) {
+						enter()
+					}
+				}
+				event.preventDefault()
+			}).keydown(function(event) {
+				clearTimeout(requestTimer);
+				requestTimer = 0
+			}).blur(function(event) {
+				setTimeout(function() {
+					clean()
+				}, 200)
+			});
+		});
+
+	}
+})(jQuery);
+//@charset "gbk";
+function setCookie(name, value, time) {
+    var strsec = getsec(time);
+    var exp = new Date();
+    exp.setTime(exp.getTime() + strsec * 1);
+    document.cookie = name + '=' + escape(value) + ';expires=' + exp.toGMTString() + ';path=/;domain=.10jqka.com.cn';
+}
+
+function getsec(str) {
+    var str1 = str.substring(1, str.length) * 1;
+    var str2 = str.substring(0, 1);
+    if (str2 == 's') {
+        return str1 * 1000;
+    } else if (str2 == 'h') {
+        return str1 * 60 * 60 * 1000;
+    } else if (str2 == 'd') {
+        return str1 * 24 * 60 * 60 * 1000;
+    }
+}
+
+function getCookie(name) {
+    var arr, reg = new RegExp('(^| )' + name + '=([^;]*)(;|$)');
+    if (arr = document.cookie.match(reg)) {
+        return unescape(arr[2]);
+    } else {
+        return null;
+    }
+}
+
+function delCookie(name) {
+    var exp = new Date();
+    exp.setTime(exp.getTime() - 1);
+    var cval = getCookie(name);
+    if (cval != null) {
+        document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString() + ';path=/;domain=.10jqka.com.cn';;
+    }
+}
+
+function searchAll($btn) {
+    this.bindFunc = function($auto, input) {
+        $btn.unbind('click').bind('click', function() {
+            var url = '',
+                code = $auto.find('dd.selected').eq(0).attr('data-code'),
+                type = $auto.find('dd.selected').eq(0).parent().attr('data-type');
+            if (typeof(code) != 'undefined') {
+                if (type == 'stock') {
+                    url = 'http://stockpage.10jqka.com.cn/' + code + '/';
+                }
+                if (type == 'fund') {
+                    url = 'http://fund.10jqka.com.cn/' + code + '/';
+                }
+            } else {
+                if (type == 'f10') {
+                    if (input.value != input.defaultValue) {
+                        var $dd = $auto.find('dd.selected').eq(0);
+                        if (!$auto.is(':hidden') && $dd) {
+                            $dd.trigger('click');
+                        } else { //�������޶�Ӧѡ������
+                            url = 'http://www.iwencai.com/stockpick/search?typed=1&preParams=&ts=1&f=1&qs=f10stock_query&selfsectsn=&querytype=&searchfilter=&tid=stockpick&w=' + encodeURIComponent(input.value);
+                        }
+                    } else {
+                        url = 'http://www.iwencai.com/stockpick?tid=stockpick&qs=f10stock_query';
+                    }
+
+                } else {
+                    if (input.value != input.defaultValue) {
+                        url = 'http://www.iwencai.com/stockpick/search?typed=1&preParams=&ts=1&f=1&qs=f10stock_query&selfsectsn=&querytype=&searchfilter=&tid=stockpick&w=' + encodeURIComponent(input.value);
+                    } else {
+                        url = 'http://www.iwencai.com/stockpick?tid=stockpick&qs=f10stock_query';
+                    }
+                }
+            }
+
+            if (type != 'f10' && !input.value) {
+                url = 'http://www.iwencai.com/stockpick?tid=stockpick&qs=f10stock_query';
+            }
+            if (url) {
+                openbrower(url, $btn);
+                //window.open(url);
+            }
+        })
+    }
+};
+
+function searchLog(word, title) {
+    var image = document.createElement("img");
+    image.style.display = "none";
+    document.body.appendChild(image);
+    image.src = "http://basic.10jqka.com.cn/api/stock/saveSearchWord.php?word=" + word + "&click=" + title;
+}
+$('#autocomplete_search_input dd').live('click', function() {
+    var url = $(this).attr('data-url');
+    var obj = this;
+    var type = $(this).attr('data-type');
+    openbrower(url, obj, type);
+});
+
+function openbrower(url, obj, type, e) {
+    if (type == 'f10') {
+        sendTalog('f10_stock_search_gotof10#f10_stock_search_goto');
+    } else {
+        sendTalog('f10_stock_search_goiwc#f10_stock_search_goto');
+    }
+    var urls = url;
+    var obj = $(obj);
+    var cookies = JSON.parse(getCookie('searchHistory'));
+    if (cookies) {
+        if ($('#search_input').val() == cookies[0]['title']) {
+            obj.attr('block', cookies[0]['block']);
+            obj.attr('code', cookies[0]['code']);
+            //obj.attr('jumptype', cookies[0]['jumptype']);
+            type = cookies[0]['jumptype'];
+        }
+    }
+    if ($('#search_input').val() == $("#defaultcontent").val()) {
+        if ($("#locationttype").val() == 1) {
+            obj.attr('block', $("#location").val());
+            obj.attr('code', $('#stockCode').val());
+            type = 'f10';
+        }
+    }
+    var code = obj.attr('code') || '';
+    var block = obj.attr('block') || '';
+    var title = obj.children('span').text() || $('#search_input').val();
+    var jumptype = obj.attr('jumptype') || '';
+    var historyArr = []; //������ʷ��¼
+    var thisInfo, temp, len;
+
+    if ($('#search_input').val() || title) {
+        searchLog($('#search_input').val(), title);
+    } else {
+        sendTalog('f10_stock_search_empty');
+    }
+    if (!getCookie('searchHistory')) {
+        setCookie('searchHistory', '', 'h24');
+    }
+    thisInfo = {
+        'url': url,
+        'code': code,
+        'block': block,
+        'title': title,
+        'jumptype': jumptype
+    };
+    temp = getCookie('searchHistory');
+    if (!!temp) {
+        historyArr = JSON.parse(getCookie('searchHistory'));
+    }
+    //����������д��ַ
+    for (var i = 0; i < historyArr.length; i++) {
+        if (historyArr[i].title == $('#search_input').val()) {
+            thisInfo.url = url = historyArr[i].url;
+            if (url.indexOf('http://basic.10jqka.com.cn') > -1) {
+                type = 'f10';
+            }
+            break;
+        }
+    }
+    for (var i = 0; i < historyArr.length; i++) {
+        if (historyArr[i].title == thisInfo.title) {
+            var arr1 = historyArr.slice(0, i);
+            var arr2 = historyArr.slice(i + 1, historyArr.length);
+            historyArr = arr1.concat(arr2);
+            break;
+        }
+    }
+    historyArr.unshift(thisInfo);
+    len = historyArr.length;
+    if (len > 8) {
+        historyArr = historyArr.slice(0, 8);
+    }
+    temp = JSON.stringify(historyArr);
+    setCookie('searchHistory', temp, 'h24');
+    $('#search_input').val(title);
+
+    if (urls.indexOf('http://basic.10jqka.com.cn') > -1) {
+        type = 'f10';
+    }
+    if (type == 'f10') {
+        try {
+            if (code == $('#stockCode').val()) {
+                var nowurl = window.location.href;
+                var cates = block.split('#');
+                if (cates[0] && cates[1] && nowurl.indexOf(cates[0]) > 0) {
+                    $("a[name='" + block + "']").eq(0).click();
+                } else {
+                    window.location.href = "http://basic.10jqka.com.cn/" + code + '/' + block;
+                }
+            } else {
+                external.createObject('Util');
+                setReviewJumpState(escape(block));
+                window.API.use({
+                    method: 'Quote.switchPage',
+                    data: {
+                        code: code
+                    },
+                    success: function() {
+
+                    }
+
+                })
+            }
+        } catch (e) {
+            window.open(url);
+        }
+    } else {
+        try {
+            external.createObject('Util');
+            window.API.use({
+                method: 'Util.openURL',
+                data: [urls, 1]
+            })
+        } catch (e) {
+            window.open(url);
+        }
+    }
+    return false;
+}
+
+function cleanHistory() {
+    delCookie('searchHistory');
+    $('#search_input').val($('#search_input').get(0).defaultValue);
+}
+if (getCookie('searchHistory')) {
+    var historyArr = JSON.parse(getCookie('searchHistory'));
+    var title = historyArr[0].title;
+    $('#search_input').val(title);
+}
+if (!getCookie('searchGuide')) {
+    //$('.tips-box').show();
+    setCookie('searchGuide', 'sg', 'd365');
+}
+//����������̾���
+$("#search_input").focus(function() {
+    $(this).closest('div').addClass('focused');
+}).blur(function() {
+    $(this).closest('div').removeClass('focused');
+});
+$(document).click(function(e) {
+    if (!$(e.target).is('#search_input') && !$(e.target).is('#search_submit')) {
+        if (getCookie('searchHistory')) {
+            var historyArr = JSON.parse(getCookie('searchHistory'));
+            var title = historyArr[0].title;
+            $('#search_input').val(title);
+        } else {
+            $('#search_input').val($('#search_input').get(0).defaultValue);
+        }
+    }
+});
+$.fn.autocomplete && $("#search_input").autocomplete({
+    stock: false,
+    hk: false,
+    fund: false,
+    extra: false,
+    usa: false,
+    f10: true,
+    func: [new searchAll($("#search_submit"))]
+});
+
+$(window).scroll(function() {
+    if (!$("#autocomplete_search_input").is(':hidden')) {
+        $("#search_input").blur();
+        $("#autocomplete_search_input").hide();
+    }
+})
+
+function changeDefaultWord() {
+    $.ajax({
+        url: 'http://basic.10jqka.com.cn/xml/defaultWord.json',
+        type: 'GET',
+        dataType: 'json',
+        cache: true,
+        success: function(jsonp) {
+            if (!jsonp) {
+                return false;
+            }
+            var obj = jsonp;
+            if (obj.length > 0) {
+                var index = Math.floor((Math.random() * obj.length));
+                if (!getCookie('searchHistory')) {
+                    $("#search_input").val(obj[index]['word']);
+                }
+                var html = "<input type='hidden' id='locationttype' value='" + obj[index]['locationtype'] + "'/>";
+                var html = html + "<input type='hidden' id='location' value='" + obj[index]['location'] + "'/>";
+                var html = html + "<input type='hidden' id='defaultcontent' value='" + obj[index]['word'] + "'/>";
+                $("#wordraddom").html(html);
+            }
+        }
+    });
+}
+changeDefaultWord();
+$(function() {
+    function initFloatBox() {
+        var _searchbar = $(".iwc_searchbar");
+        var _wp = $(".wrapper").outerWidth();
+        var _wd = $(window).width();
+        var _left;
+        if (_wd > _wp) {
+            _left = (_wd - _wp) / 2 + _wp - _searchbar.width();
+        } else {
+            _left = _wd - _searchbar.width();
+        }
+        _searchbar.css({
+            left: _left
+        }).show();
+        $('#autocomplete_search_input').hide();
+    }
+	var hashs = window.location.hash.substring(1);
+    hashArrays = hashs.split('='); 
+    if (location.href.indexOf('interactive.html') > -1 || hashArrays[0] == 'stockpage') {
+        $('.iwc_searchbar').hide();
+    } else {
+        var _searchbar = $(".iwc_searchbar");
+        if (_searchbar.length > 0) {
+            initFloatBox();
+            _searchbar.click(function() { $(this).removeClass("float_box") });
+
+            var resizeTimer = null;
+            $(window).resize(function() {
+                if (resizeTimer) {
+                    clearTimeout(resizeTimer)
+                }
+                resizeTimer = setTimeout(function() {
+                    initFloatBox();
+                }, 400);
+            });
+        }
+    }
+});
+var _searchbar = $(".iwc_searchbar");
+$(window).scroll(function() {
+    _searchbar.addClass("float_box");
+    var _scrolltop = $(window).scrollTop();
+    if (_scrolltop == 0) {
+        _searchbar.removeClass("float_box");
+    }
+});
+
+//20160108 ������������3����ʧ
+function hideEvent() {
+    setTimeout(function() {
+        if ($('.iwc_searchbar').attr('mouseTag') == 'leave') {
+            $('body').trigger('click');
+            $('#search_input').trigger('blur');
+        }
+        $(document).bind('mousemove', function(e) {
+            bodyMousemoveEvent(e);
+        });
+    }, 3000);
+}
+
+function getPostion(e) {
+    e = e || window.event;
+    var x = e.pageX;
+    var y = e.pageY;
+    return [x, y];
+}
+var hideCount = 0;
+
+function bodyMousemoveEvent(e) {
+    hideCount = 0;
+    if ($('.iwc_searchbar').hasClass('focused')) {
+        setTimeout(function() {
+            var minX = $('.iwc_searchbar').offset().left,
+                maxX = $('.iwc_searchbar').offset().left + $('#search_input').outerWidth() + $('#search_submit').outerWidth(),
+                minY = $('.iwc_searchbar').offset().top,
+                maxY = $('.iwc_searchbar').offset().top + $('.iwc_searchbar').outerHeight() + $('#autocomplete_search_input').outerHeight(),
+                pos = getPostion(e);
+            if (!(pos[0] >= minX && pos[0] <= maxX && pos[1] >= minY && pos[1] <= maxY)) {
+                hideCount++;
+                if (hideCount == 1) { //����hideEventִ�ж��
+                    $(document).unbind('mousemove');
+                    hideEvent();
+                }
+            }
+        }, 500);
+    }
+}
+$('.iwc_searchbar,#autocomplete_search_input').mouseenter(function() {
+    $('.iwc_searchbar').attr('mouseTag', 'enter');
+}).mouseleave(function() {
+    $('.iwc_searchbar').attr('mouseTag', 'leave');
+});
+$(document).bind('mousemove', function(e) {
+    bodyMousemoveEvent(e);
+});//@charset "utf-8";
+$('.tips-box a').click(function(e){
+    if($(this).hasClass('next')){
+        var index = $(this).parents('.info').index() + 1;
+    }else{
+        var index = $(this).parents('.info').index() - 1;
+    }
+    if(index >= 0){
+        $('.tips-box .info').hide().eq(index).show();
+    }
+});
+$('.tips-box .close').click(function(){
+    $('.tips-box').hide();
+});
+$('.tips-icon').click(function(){
+    $('.tips-box').show();
+});
+$(document).click(function(e){
+    if($(e.target).closest('.tips-box').length < 1 && $(e.target).closest('.tips-icon').length < 1){
+        $('.tips-box').hide();
+    }
+})

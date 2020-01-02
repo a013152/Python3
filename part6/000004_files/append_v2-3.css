@@ -1,0 +1,68 @@
+@charset "gbk";
+.f10_append{position:fixed;width: 54px;left: 50%;margin-left: 512px;bottom: 267px;_position: absolute;_top: expression(eval(document.documentElement.scrollTop || document.body.scrollTop) +eval(document.documentElement.clientHeight || document.body.clientHeight) -305+'px');z-index: 998;}
+#r-go-top{height:146px;position:fixed;width: 40px;left: 50%;margin-left: 512px;bottom: 15%;_position: absolute;_top: expression(eval(document.documentElement.scrollTop || document.body.scrollTop) +eval(document.documentElement.clientHeight || document.body.clientHeight) -305+'px');z-index: 998;}
+.VoteBox{position:fixed;left: 50%;width: 281px;margin-left: 212px;bottom: 110px;_position: absolute;_top: expression(eval(document.documentElement.scrollTop || document.body.scrollTop) +eval(document.documentElement.clientHeight || document.body.clientHeight) -305+'px');z-index: 998;}
+.f10_append_con{margin-bottom:3px; position:relative;}
+.f10_append_icons{background:url(http://i.thsi.cn/sns/external/r_tip.png) no-repeat;width:40px;height:40px;display:inline-block;}
+.f10_append_advice{background-position:-90px -165px;}
+.f10_append_advice:hover{background-position:-130px -165px;}
+.f10_append_gotop{background-position:-90px -131px;height:30px;}
+.f10_append_gotop:hover{background-position:-130px -131px;height:30px;}
+.f10_append_askdm{background-position:-90px -209px;}
+.f10_append_askdm:hover{background-position:-130px -209px;}
+.f10_append_iwencai{background-position:-90px -252px;}
+.f10_append_iwencai:hover{background-position:-130px -252px;}
+/* modify 20150520*/
+#r-go-top{_top: expression(eval(document.documentElement.scrollTop || document.body.scrollTop) +eval(document.documentElement.clientHeight || document.body.clientHeight) -355+'px');}
+.VoteBox{width:427px;margin-left: 53px;bottom: 106px;_position: absolute;_top: expression(eval(document.documentElement.scrollTop || document.body.scrollTop) +eval(document.documentElement.clientHeight || document.body.clientHeight) -355+'px');}
+.f10_append_icons{width:31px;background:url(http://i.thsi.cn/images/basic/stock/r_tip.png) no-repeat;}
+.f10_append_gotop{background-position:0px -419px;height:19px;}
+.f10_append_gotop:hover{background-position:-32px -419px;height:19px;}
+.f10_append_advice{background-position:0px -296px;height: 115px;}
+.f10_append_advice:hover{background-position:-32px -296px;height: 115px;}
+/* add 20160115 */
+.VoteBox{width: 428px;margin-left: 52px;border-width: 8px;padding: 0 3px;bottom: 100px;z-index: 1000;}
+.VoteBox p{margin: 0;padding: 0;}
+.VoteBox .frbody{padding: 0 11px;border: none;border-bottom: 1px #555 dashed;}
+.VoteBox .closeBtn{top: 0;right: 0;width: 21px;height: 21px;line-height: 21px;text-align:center;font-weight: 700;font-size: 18px;color: #9f9f9f;cursor: pointer;}
+.VoteBox .tit{line-height: 20px;padding: 8px 0;}
+.VoteBox textarea {width: 384px;height: 76px;background: #0e0e0e;}
+.VoteBox .frbody input{width: 210px;height: 23px;line-height: 23px;margin: 0 14px;}
+.VoteBox .vbutton{float: right;width: 98px;height: 33px;line-height: 33px;margin: 0;background: url(http://i.thsi.cn/images/basic/stock/votebox-icon.png) 0 0 no-repeat;color: #ffaa00;text-align: center;}
+.VoteBox .tel{padding: 11px 0;}
+.VoteBox .tel span,.VoteBox .tel input{float: left;}
+.VoteBox .tel span{line-height: 33px;}
+.VoteBox .qbox{padding-left: 11px;height: 276px;overflow-y: auto;font-size: 14px;}
+.VoteBox .qtit{margin-top: 10px;width: 98px;height: 31px;line-height: 31px;color: #ffaa00;text-align: center;background: #1b1b1b;}
+.VoteBox .qlist{line-height: 18px;color: #fff;height: 235px;}
+.VoteBox .qlist .hd{padding-top: 6px;color: #ffba00;}
+.VoteBox .qlist .cont{margin: 6px 0 14px 0;}
+.VoteBox .qlist a{color: #0199fa;}
+#r-go-top{width: 31px;height: 164px;bottom: 50px;}
+#r-go-top .f10_append_con{width: 31px;height: 138px;margin-bottom: 7px;background: url(http://i.thsi.cn/images/basic/stock/votebox-icon.png) 0 -66px no-repeat;}
+#r-go-top .f10_append_box1{display: block;width: 100%;height: 68px;}
+#r-go-top .f10_append_box2{display: block;width: 100%;height: 70px;}
+#r-go-top .f10_append_box1hov{background: url(http://i.thsi.cn/images/basic/stock/votebox-icon.png);background-position: -32px -66px;}
+#r-go-top .f10_append_box2hov{background: url(http://i.thsi.cn/images/basic/stock/votebox-icon.png);background-position: -32px -134px;}
+#r-go-top .f10_append_icons{background: url(http://i.thsi.cn/images/basic/stock/votebox-icon.png) no-repeat;}
+#r-go-top .f10_append_explain{display: inline-block;margin: 25px 0 0 3px;width: 28px;height: 43px;}
+#r-go-top .f10_append_advice{display: inline-block;margin: 3px 0 0 3px;width: 28px;height: 67px;}
+#r-go-top .f10_append_gotop{background-position: 0 -211px;}
+#r-go-top .f10_append_gotop:hover{background-position: -32px -211px;}
+.votepopbox{bottom: 100px;margin-left: 52px;width: 450px;height: 466px;z-index: 1001;}
+.vpopicon{margin-top: 160px;}
+.votepopbox, .VoteBox, #r-go-top{
+    _position:absolute;
+    _bottom:auto;
+    _top:expression(eval(document.documentElement.scrollTop+document.documentElement.clientHeight-this.offsetHeight-(parseInt(this.currentStyle.marginTop,10)||0)-(parseInt(this.currentStyle.marginBottom,10)||0))); _margin-bottom:100px;
+}
+.scrollcss{height: 100%;*overflow-y:visible;}
+.scrollcss body{height: 100%;overflow-y: hidden;}
+/* add 0521 */
+#r-go-top .f10_append_box1,.r-widget-con{display: none;}
+#r-go-top{width: 108px;height: 35px;margin-left: -588px;}
+#r-go-top .f10_append_con,#r-go-top .f10_append_box2,#r-go-top .f10_append_advice{width: 100%;height: 100%;}
+#r-go-top .f10_append_con{background: url(http://i.thsi.cn/images/basic/stock/ixg/i-icons.jpg) 0 -256px no-repeat;}
+#r-go-top .f10_append_box2hov{background: url(http://i.thsi.cn/images/basic/stock/ixg/i-icons.jpg) 0 -289px no-repeat;}
+#r-go-top .f10_append_advice{margin: 0;}
+.VoteBox{margin-left: -470px;}

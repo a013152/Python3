@@ -1,0 +1,251 @@
+var THS={module:{},config:{},comment:{},souniu:{},storage:[]};THS.object=THS.object||{};THS.extend=THS.object.extend=function(a,b){for(var c in b)b.hasOwnProperty(c)&&(a[c]=b[c]);return a};
+THS.cookie={set:function(a,b,c,e,d){if(d){var g=new Date;g.setTime(g.getTime()+36E5*d)}document.cookie=a+"="+b+"; "+(d?"expires="+g.toGMTString()+"; ":"")+(e?"path="+e+"; ":"path=/; ")+(c?"domain="+c+";":"domain="+THS.config.DCCookieDomain+";");return!0},get:function(a){a=document.cookie.match(RegExp("(?:^|;+|\\s+)"+a+"=([^;]*)"));return!a?"":unescape(a[1])}};
+THS.css={updateClassName:function(a,b,c){if(!a||1!=a.nodeType)return"";var e=a.className,d,g;if(b&&"string"==typeof b||c&&"string"==typeof c){if("*"==b)e="";else{d=e.split(" ");for(var f=0,i=d.length,h,e={};f<i;++f)d[f]&&(e[d[f]]=!0);if(c){d=c.split(" ");i=d.length;for(f=0;f<i;++f)(h=d[f])&&!e[h]&&(g=e[h]=!0)}if(b){d=b.split(" ");i=d.length;for(f=0;f<i;f++)(h=d[f])&&e[h]&&(g=!0)&&delete e[h]}}if(g){d.length=0;for(var j in e)d.push(j);e=d.join(" ");a.className=e}}return e},hasClassName:function(a,
+b){return a&&(a=a.className)&&b&&(" "+a+" ").indexOf(" "+b+" ")+1},addClassName:function(a,b){return THS.css.updateClassName(a,null,b)},removeClassName:function(a,b){return THS.css.updateClassName(a,b)}};THS.dom={getById:function(a){return document.getElementById(a)},get:function(a){return"string"==typeof a?document.getElementById(a):a},show:function(a){var b;try{b=THS.dom.get(a),b.style.display=""}catch(c){}},hide:function(a){try{obj=THS.dom.get(a),obj.style.display="none"}catch(b){}}};
+THS.event={addEvent:function(a,b,c){a.attachEvent?a.attachEvent("on"+b,c):a.addEventListener(b,c,!1)},delEvent:function(a,b,c){a.detachEvent?a.detachEvent("on"+b,c):a.removeEventListener(b,c,!1)},preventDefault:function(a){a.preventDefault?a.preventDefault():a.returnValue=!1}};
+THS.element={PositionX:function(a){var b=0;if(a.offsetParent)for(;a.offsetParent;)b+=a.offsetLeft,a=a.offsetParent;else a.x&&(eft+=a.x);return b},PositionY:function(a){var b=0;if(a.offsetParent)for(;a.offsetParent;)b+=a.offsetTop,a=a.offsetParent;else a.y&&(b+=a.y);return b}};THS.time={microtime:function(){return(new Date).getTime()/1E3}};
+THS.user={_user:null,_userid:null,_username:null,getUser:function(){if(null==THS.user._user){var a=THS.user.getUserid(),b=THS.user.getUname();THS.user._user={userid:a,username:b}}return THS.user._user},getUname:function(){if(null==THS.user._username)THS.user._username=unescape(THS.cookie.get("escapename"));return THS.user._username},getUserid:function(){if(null==THS.user._userid&&(THS.user._userid=unescape(THS.cookie.get("userid")),!THS.user._userid))THS.user._userid=THS.user.getUaUserid();return THS.user._userid},
+getUaUserid:function(){var a=navigator.userAgent,b=a.indexOf("userid");return-1<b?(a=a.substr(b+7),a=a.split(" "),a[0]):""}};THS.flash={getMovie:function(a){return-1!=navigator.appName.indexOf("Microsoft")?window[a]:void 0!=document[a].length?document[a][1]:document[a]},setChart:function(a,b,c){try{THS.flash.getMovie(a).CallFunction('<invoke name="'+b+'" returntype="xml">'+__flash__argumentsToXML(c,0)+"</invoke>")}catch(e){setTimeout(function(){setChart(a,b,c)},1E3)}}};
+THS.quote={_serverhost:"http://qd.10jqka.com.cn/quote.php?cate=real&type=$type&return=json&callback=showStockData&code=",_flowserverhost:"http://pop.10jqka.com.cn/getcashflow.php?jsonp=showStockData&code=",getServerhost:function(a){return!a?this._serverhost.replace(/\$type/,"stock"):this._serverhost.replace(/\$type/,a)},getFlowServerHost:function(){return this._flowserverhost},getData:function(a,c,e,h){"object"==typeof h&&h.render();a=this.getServerhost(e)+a;$.ajax({url:a,dataType:"jsonp",cache:!0,
+jsonp:!1,jsonpCallback:"showStockData",success:function(b){if(b)return"object"==typeof c?c.render(b):b}})},getFlowData:function(a,c){var a=a.split(",").join("|"),e=this.getFlowServerHost()+a;$.ajax({url:e,dataType:"jsonp",cache:!0,jsonp:!1,jsonpCallback:"showStockData",success:function(a){if(a)return"object"==typeof c?c.render(a):a}})},formatResult:function(a){var c=[],e=0;$.each(a.data,function(a,b){if(null!=b)if(0<b[10]){var d=Math.round(100*(b[10]-b[6]))/100,f=Math.round(1E4*(d/b[6]))/100;c[e++]=
+{code:a,change:d,nowprice:b[10],preprice:b[6],percent:f}}else c[e++]={code:a,change:"0",nowprice:"-",preprice:"-",percent:"0"};else c[e++]={code:a,change:"0",nowprice:"-",preprice:"-",percent:"0"}});$.each(a.info,function(a,b){for(var d=0;d<c.length;d++)if(c[d].code==a)c[d].name=b.name});return c},formatStockFlowResult:function(a){var c=[],e=0;$.each(a.list,function(a,b){if(null!=b){var d=parseInt(b.inrmb),f=parseInt(b.outrmb);0<d||(d=0);0<f||(f=0);var g=d-f,d=Math.round(d/100)/100,f=Math.round(f/
+100)/100,g=parseFloat(Math.round(g/100)/100);c[e++]={code:b.code,name:b.name,percent:b.zdf,inrmb:d,outrmb:f,diff:g}}});return c.sort(function(a,b){return b.diff-a.diff})}};
+// @charset "utf-8";
+/********************************************************************
+ths analytics(TA script)
+author: away@myhexin.com
+history:
+2011-05-27	创建
+2011-06-15
+	增加了自动判断是否是client的功能。对于客户端和网站，可以不使用ld
+	增加了_top选项，如果是false,则取当前页面url以及referrer，否则取父frame的url和referrer.默认为true
+2011-08-22
+    增加了cs字段，表示clientSize，也就是客户view的大小。
+usage:
+    兼容原stat方法:
+    TAN.log(10347, 'client');
+    TAN.log({id: 10347, ld: 'client'});
+    TAN.log(10348); // 默认ld='browser'
+    对于需要传递的参数可以任意增加，例如
+    TAN.log({cost: 1024, type: 'school', author: '10jqka'});
+    那么以上所有参数都会被带到url中进行传递。
+
+    另外ta对象提供了对点击事件的记录，以下代码在id为btn1的对象点击时，会向日志服务器发送一个点击记录,该记录带有鼠标点击位置信息。
+    TAN.logElementClick(document.getElementById('btn1'), {eid: 'btn1'});
+
+    对于在屏幕上的任意点击也可以记录。
+    TAN.logClick({eid: 'window', _sid: '__ta_wclick__', _top: false});
+
+    对于document所有的锚点点击可以进行自动加载处理。日志中会带有该锚点的href信息
+    TAN.logArchorClick({type: 'archor'});
+
+    两个内部属性：
+    _base:	基本的点击路径的信息。默认是http://stat.10jqka.com.cn/q?。可以在传递参数中修改。
+    _sid:    点击统计是通过在文档中插入图片实现的。这个图片id默认为__ths_stat__，如果存在同时激发多个记录，那么需要对id进行区分。这个时候需要重定义_sid
+
+*********************************************************************/
+// 日志记录对象
+// 提供 add和log两个方法进行日志记录
+var page_op = new Date().getTime();
+var ac_page = 1,ac_page_timer;
+var ths_stat_new = function() {
+	this.objid = 0;
+	this.ld = 'browser';
+	try {
+		if (typeof external != 'undefined' && typeof external.createObject != 'undefined') {
+			this.ld = 'client';
+		}
+	} catch (e) {}
+	this._top = true;
+	this.scrratio = screen.width+"x"+screen.height;
+	var proto = 'https:' == document.location.protocol ? "https:" : "http:";
+	this._base = proto+'//stat.10jqka.com.cn/q?';
+	this._sid = '__ths_stat__';
+	this.optime = page_op;
+	this.userid = THS.user.getUname();
+	//this.frinfo = document.location.href.split("#log=")[1];
+	this.acpage = ac_page.toString();
+	this.backcolor = 'white';
+	this.url_ver = 'THSNEWS-6522';
+	this.log_ver = '2.0';
+	ac_page ++;
+	clearInterval(ac_page_timer);
+	ac_page_timer = setTimeout(function(){
+		ac_page = 1;
+	},10*1000*60);
+};
+
+// 具体访问进行日志记录
+// @param url string 记录的日志
+ths_stat_new.prototype._navigate = function(url) {
+	var el = document.getElementById(this._sid);
+	if (!el) {
+		el = document.createElement('img');
+		el.objid = this._sid;
+		el.height = 0;
+		el.width = 0;
+		el.setAttribute("style", "display:none");
+		document.body.appendChild(el);
+	}
+	el.src   = url;
+};
+
+// 增加提交的参数信息
+// @param p1 Object|number  对于Object方式，将所有属性加入到this.否则认为是id
+// @param p2 string ld
+ths_stat_new.prototype.add = function(p1, p2) {
+	if (p1 && p2) {
+		this.objid = p1;
+		this.ld = p2;
+	} else if (p1 instanceof Object){
+		for(k in p1) {
+			this[k] = p1[k];
+		}
+	} else if (p1) {
+		this.objid = p1;
+	}
+}
+
+// 设置访问的location地址
+ths_stat_new.prototype._setLocation = function() {
+	if (this._top && top) {
+		try{
+			if (!this.frurl) {
+				this.frurl = top.document.referrer;
+				this.frtype = this.frurl == "" ? '0' : (this.frurl.indexOf("10jqka")>-1 ? '2' : '1');
+			}
+			if (!this.cururl) {
+				this.cururl = top.location.href;
+			}
+		}catch(e) {}
+	}
+	if (!this.frurl) {
+		this.frurl = (document.referrer) ? document.referrer : "";
+	}
+	if (!this.cururl) {
+		this.cururl = window.location.href;
+	}
+	// 客户区大小在这个时候再进行设置。
+	this.scrsize = document.body.clientWidth+"x"+document.body.clientHeight;
+	this.actime = (new Date()).getTime();
+
+}
+
+// 返回访问的url
+ths_stat_new.prototype._getUrl = function() {
+	this._setLocation();
+	var url = [];
+	if (!window.__ta_performance) {
+		if (window.performance && window.performance.timing) {
+			var _timing = window.performance.timing;
+			try {
+				url.push('dt=' + (_timing.domainLookupEnd - _timing.domainLookupStart) + '&');
+				url.push('tt=' + (_timing.connectEnd - _timing.connectStart) + '&');
+				url.push('rt=' + (_timing.responseStart - _timing.requestStart) + '&');
+				url.push('bt=' + (_timing.responseStart - _timing.navigationStart) + '&');
+				//this.frinfo = THS.cookie.get("log");
+				url.push('frinfo=' + THS.cookie.get("log") + '&' );
+				THS.cookie.set("log",'','10jqka.com.cn','',1);
+				url.push('sp=1');
+			} catch (e) {
+
+			}
+		} else {
+			// 不支持的浏览器也要传，表示不支持
+			url.push('sp=0');
+		}
+		window.__ta_performance = true;
+	}
+	for(k in this) {
+		if (k && k.charAt(0) != '_' && this[k] && typeof(this[k]) != 'function') {
+			if (url.length) {
+				url.push('&');
+			}
+			url = url.concat([encodeURIComponent(k), "=", encodeURIComponent(this[k])]);
+		}
+	}
+	return this._base + url.join('');
+}
+
+// 对本对象进行日志记录
+//2016-11-21 新增操作位置zy坐标
+ths_stat_new.prototype.log = function() {
+	var event = window.event;
+	if(event){
+		event = this.getEvent(event);
+		var pos = event.pageX + ',' + event.pageY; //区别页面加载事件完成时为00
+		this._navigate(this._getUrl() + '&acloca=' + pos);
+	}else{
+		this._navigate(this._getUrl());
+	}
+};
+
+// 取得event对象。为了取得点击的位置
+ths_stat_new.prototype.getEvent = function(event) {
+	event = event ? event : window.event;
+	if ( event.pageX == null && event.clientX !=  null ) {
+		var doc = document.documentElement, body = document.body;
+		event.pageX = event.clientX + (doc && doc.scrollLeft || body && body.scrollLeft || 0) - (doc && doc.clientLeft  || body && body.clientLeft || 0);
+		event.pageY = event.clientY + (doc && doc.scrollTop  ||  body && body.scrollTop  || 0) - (doc && doc.clientTop  || body && body.clientTop  || 0);
+	}
+	return event;
+}
+
+
+// 记录点击点
+ths_stat_new.prototype._onClick = function(event) {
+	event = this.getEvent(event);
+	var pos = event.pageX + ',' + event.pageY;
+	this._navigate(this._getUrl() + '&acloca=' + pos);
+};
+
+// 绑定点击动作
+ths_stat_new.prototype.bindClick = function(el, attrs) {
+	var stat = this;
+	var onclick = function(e) {
+		for(index in attrs) {
+			attr = attrs[index];
+			stat[attr] = el.getAttribute(attr);
+		}
+		stat._onClick(e);
+	};
+	if (el.addEventListener) {
+		el.addEventListener('click', onclick(event), false);
+	} else {
+		el.attachEvent('onclick', onclick);
+	}
+};
+
+// 全局namespace
+var TAN = {
+
+	// 进行日志记录
+	log: function() {
+		var stat = new ths_stat_new();
+		stat.add.apply(stat, arguments);
+		stat.log();
+	},
+	// 记录点击
+	logClick: function() {
+		var stat = new ths_stat_new();
+		stat.add.apply(stat, arguments);
+		stat.bindClick.call(stat, window);
+	},
+
+	// 绑定页面上所有锚的点击事件
+	logArchorClick: function() {
+		var stat = new ths_stat_new();
+		stat.add.apply(stat, arguments);
+		var archors = document.getElementsByTagName('a');
+		for(var i = 0; i < archors.length; ++i) {
+			stat.bindClick.call(stat, archors[i], ['href']);
+		}
+	},
+
+	// 绑定指定element的点击事件
+	logElementClick: function(el, params) {
+		var stat = new ths_stat_new();
+		stat.add(params);
+		stat.bindClick.call(stat, el);
+	}
+};

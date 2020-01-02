@@ -1,0 +1,39 @@
+//@charset "gbk";
+var hash = window.location.hash.substring(1);
+hashArray = hash.split('=');
+if (hashArray[0] == 'stockpage') {
+    if ($(".iwc_searchbar").length > 0) {
+        $(".iwc_searchbar").hide();
+    }
+    if ($("#r-go-top").length > 0) {
+        $("#r-go-top").hide();
+    }
+    // 公司资料反馈、十大流通股通反馈隐藏
+    if ($('.gd_ques.iwcclick').length > 0) {
+        $('.gd_ques.iwcclick').hide();
+    }
+
+    if (('.f10_append_fd_btn').length > 0) {
+        $('.f10_append_fd_btn').hide();
+    }
+
+    $(".header").hide();
+    $(".content").css('margin-top', '0px');
+    addCssByLink('http://s.thsi.cn/cb?css/basic/stock/stockpage_v1.css');
+    document.domain = "10jqka.com.cn";
+
+    function IFrameResize(height) {
+        var obj = parent.document.getElementById("dataifm");
+        if (obj) {
+            obj.height = $(document.body).height() + height;
+        }
+    }
+    $(document).click(function(e) {
+        if (e.target.className.indexOf('profit-forecast-more') !== -1) {
+            setTimeout(IFrameResize(250), 100);
+        } else {
+            $('.the_all').addClass('hidden')
+            setTimeout(IFrameResize(0), 100);
+        }
+    })
+}

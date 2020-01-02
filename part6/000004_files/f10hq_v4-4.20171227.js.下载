@@ -1,0 +1,235 @@
+//@charset "gbk";
+var stockcode = $("#stockCode").val();
+//点击区块跳转到分时图
+$("#quotedata").click(function() {
+    market = stockcode.substring(0, 1);
+    id = (market == 0 || market == 3 || market == 6) ? "9354" : "12086";
+    window.API.use({
+        method: 'Quote.switchPage',
+        data: {
+            'id': id,
+            'code': stockcode,
+            'period': '0'
+        }
+    })
+
+})
+
+try {
+    external.createObject('Util');
+    var externalSessionId = window.API.createSessionId('external');
+    window.API.use({
+        method: 'external.registerEvent',
+        data: 'onshow',
+        sessionId: externalSessionId,
+        persistent: true,
+        callbackName: 'onshow',
+        success: function(inPage) {
+            if (inPage) {} else {
+                window.API.use({
+                    method: 'Quote.unregisterPush',
+                    success: function() {
+
+                    }
+                })
+            }
+        }
+
+    })
+} catch (e) {}
+
+
+function registerPush() {
+    try {
+        var quoteSessionId = window.API.createSessionId('Quote');
+        external.createObject('Util');
+        window.API.use({
+            method: 'Quote.registerPush',
+            data: {
+                code: stockcode
+            },
+            sessionId: quoteSessionId,
+            persistent: true,
+            callbackName: 'onready',
+            success: function(data) {
+                window.API.use({
+                    method: 'Quote.getData',
+                    data: {
+                        code: stockcode,
+                        type: "NEW"
+                    },
+                    success: function(datas) {
+                        var zxj2 = eval(datas);
+                        zxjdata = zxj2[stockcode]['NEW'];
+                        zdfdata = (zxjdata - predata) * 100 / predata;
+                        zxjshuju = parseFloat(zxjdata).toFixed(2);
+                        zdfshuju = parseFloat(zdfdata).toFixed(2);
+                        if (zxjdata != 'NUL') {
+                            $("#zxj").text(zxjshuju); //最新价
+                        } else {
+                            $("#quotedata").css("width", "60px");
+                            $("#quotedata").css("margin-left", "190px");
+                            var f004 = $('#F004').val();
+                            if (f004 == 1 || f004 == 5 || f004 == 6) {
+                                $("#quotedata").text("停牌"); //最新价
+                            } else {
+                                if (f004 == 3) {
+                                    $("#quotedata").text("暂停上市"); //最新价
+                                }
+                                if (f004 == 2 || f004 == 7) {
+                                    $("#quotedata").text("未上市"); //最新价
+                                }
+                                if (f004 == 4) {
+                                    $("#quotedata").text("终止上市"); //最新价
+                                }
+                            }
+
+                        }
+                        if (zdfdata != 'NUL') {
+                            $("#zdf").text(zdfshuju + '%'); //涨跌幅
+                            if (zdfshuju < 0) {
+                                $("#zdf").removeClass("upcolor").removeClass("hltip").addClass("downcolor");
+                                $("#zxj").removeClass("upcolor").removeClass("hltip").addClass("downcolor");
+                            } else if (zdfshuju > 0) {
+                                $("#zdf").removeClass("downcolor").removeClass("hltip").addClass("upcolor");
+                                $("#zxj").removeClass("downcolor").removeClass("hltip").addClass("upcolor");
+                            } else {
+                                $("#zdf").removeClass("downcolor").removeClass("upcolor").addClass("hltip");
+                                $("#zxj").removeClass("downcolor").removeClass("upcolor").addClass("hltip");
+                            }
+                        }
+                    }
+                })
+            }
+        })
+    } catch (e) {
+        $("#quotedata").css('display', 'none');
+    }
+}
+
+var t = setTimeout(function() {
+    window.API.use({
+        method: 'Util.getHxVer',
+        success: function(data) {
+            var hexinVer = getVersionStr(data);
+            if (hexinVer >= "86000") {
+                showHq();
+            }
+        }
+    })
+}, 500)
+
+
+
+function showHq() {
+    var now = new Date();
+    var hours = now.getHours();
+    var minutes = now.getMinutes();
+    try {
+        external.createObject('Util');
+        if (hours < 9 || (hours == 9 && minutes < 20) || hours >= 15) {
+            window.API.use({
+                method: 'Quote.unregisterPush',
+                success: function() {
+
+                }
+            })
+        }
+        $("#quotedata").css('display', 'block');
+        window.API.use({
+            method: 'Quote.request',
+            data: {
+                code: stockcode,
+                type: "PRE,NEW,199112,ZHANGDIEFU"
+            },
+            callbackName: 'onready',
+            success: function() {
+                window.API.use({
+                    method: 'Quote.getData2',
+                    data: {
+                        type: ['NEW', '199112', 'PRE'],
+                        code: stockcode,
+                        period: "0",
+                        time: "0",
+                        mode: "0"
+                    },
+                    success: function(data) {
+                        var datas = eval('(' + data + ')')
+                        zxjdata = datas[stockcode]['NEW'];
+                        zdfdata = datas[stockcode]['199112'];
+                        predata = datas[stockcode]['PRE'];
+                        zxjshuju = parseFloat(zxjdata).toFixed(2);
+                        zdfshuju = parseFloat(zdfdata).toFixed(2);
+                        show = showtime();
+                        if (show) {
+                            if (zxjdata != 'NUL') {
+                                $("#zxj").text(zxjshuju); //最新价
+                            } else {
+                                $("#quotedata").css("width", "60px");
+                                $("#quotedata").css("margin-left", "190px");
+                                var f004 = $('#F004').val();
+                                if (f004 == 1 || f004 == 5 || f004 == 6) {
+                                    $("#quotedata").text("停牌"); //最新价
+                                } else {
+                                    if (f004 == 3) {
+                                        $("#quotedata").text("暂停上市"); //最新价
+                                    }
+                                    if (f004 == 2 || f004 == 7) {
+                                        $("#quotedata").text("未上市"); //最新价
+                                    }
+                                    if (f004 == 10) {
+                                        $("#quotedata").text("退市整理"); //最新价
+                                    }
+                                    if (f004 == 4) {
+                                        $("#quotedata").text("终止上市"); //最新价
+                                    }
+                                }
+                            }
+                            if (zdfdata != 'NUL') {
+                                $("#zdf").text(zdfshuju + '%'); //涨跌幅
+                                if (zdfshuju < 0) {
+                                    $("#zdf").removeClass("upcolor").removeClass("hltip").addClass("downcolor");
+                                    $("#zxj").removeClass("upcolor").removeClass("hltip").addClass("downcolor");
+                                } else if (zdfshuju > 0) {
+                                    $("#zdf").removeClass("downcolor").removeClass("hltip").addClass("upcolor");
+                                    $("#zxj").removeClass("downcolor").removeClass("hltip").addClass("upcolor");
+                                } else {
+                                    $("#zdf").removeClass("downcolor").removeClass("upcolor").addClass("hltip");
+                                    $("#zxj").removeClass("downcolor").removeClass("upcolor").addClass("hltip");
+                                }
+                            }
+                            window.API.use({
+                                method: 'Quote.unregisterPush',
+                                success: function() {
+
+                                }
+                            })
+                            registerPush();
+                        } else {
+                            $("#zxj").text('--');
+                            $("#zdf").text('--');
+                        }
+                    }
+                })
+            }
+        })
+    } catch (e) {
+        //alert(e.message);
+        //$("#quotedata").css('display','none');
+    }
+}
+//获取当前时间
+function showtime() {
+    var now = new Date();
+    var year = now.getFullYear();
+    var month = now.getMonth() + 1;
+    var day = now.getDate();
+    var hours = now.getHours();
+    var minutes = now.getMinutes();
+    var seconds = now.getSeconds();
+    if (hours < 9 || (hours == 9 && minutes < 20)) {
+        return false;
+    } else {
+        return true;
+    }
+}

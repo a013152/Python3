@@ -1,0 +1,764 @@
+$(".popShow").click(function(b){var a=$(this).attr("targ");if($("."+a).is(":visible")){$("."+a).slideUp();var a=$(this).parents().hasClass("allocation_plan"),c=$(this).parent();a&&c.find(".arrow").addClass("hidden");$(this).removeClass("m_more_m")}else{var d=b.pageX-$(this).offset().left,c=b.pageY-$(this).offset().top;if(0<navigator.userAgent.indexOf("MSIE"))var f=b.originalEvent.x,b=b.originalEvent.y,d=f-d-196,c=b-c+20;else f=b.originalEvent.layerX||b.originalEvent.x,b=b.originalEvent.layerY||b.originalEvent.y,
+d=f-d-174,c=b-c+$(this).position().top+15;$("."+a).css({left:d+"px",top:c+"px"});$("."+a).slideDown();$(this).addClass("m_more_m");a=$(this).parents().hasClass("allocation_plan");c=$(this).parent();a&&c.find(".arrow").removeClass("hidden")}return!1});
+$(".poppShow").click(function(b){var a=$(this).attr("targ");if($("."+a).is(":visible"))$("."+a).slideUp(),$(this).removeClass("m_more_m");else{var c=b.pageX-$(this).offset().left,d=b.pageY-$(this).offset().top,c=(b.originalEvent.layerX||b.originalEvent.x||0)-c-74,b=(b.originalEvent.layerY||b.originalEvent.y||0)-d+19;$("."+a).css({left:c+"px",top:b+"px"});$("."+a).slideDown();$(this).addClass("m_more_m")}return!1});
+$(".poppingShow").click(function(b){var a=$(this).attr("targ");if($("."+a).is(":visible"))$("."+a).slideUp(),$(this).removeClass("m_more_m");else{var c=b.pageX-$(this).offset().left,d=b.pageY-$(this).offset().top,c=(b.originalEvent.layerX||b.originalEvent.x||0)-c-224,b=(b.originalEvent.layerY||b.originalEvent.y||0)-d+19;$("."+a).css({left:c+"px",top:b+"px"});$("."+a).slideDown();$(this).addClass("m_more_m")}return!1});
+$("html").click(function(b){if(!$(b.target).parents(".popp_box").length&&($(".rp_tipbox").is(":visible")||$(".tipbox").is(":visible")))$(".rp_tipbox, .tipbox").slideUp(),$(".show_more .arrow").addClass("hidden"),$(".m_more").removeClass("m_more_m")});$(".check_details").click(function(){$(".check_reason").slideToggle()});$(".check_reason .close").click(function(){$(".check_reason").slideUp()});window.checked=!1;
+$(document).delegate(".check_details","click",function(){var b=$(this),a=b.parents(".performance_trailer"),c=b.find(".open_btn"),d=b.find(".close_btn"),a=a.find(".check_else");a.is(":hidden")?(!b.parents("td").hasClass(".none")&&!$(".track").is(":visible")?a.slideDown(function(){for(var b=0,a=0;6>a;a++)b+=$($("#tableList tr")[a]).height();for(var a=$(".overview").children(),c=0;c<a.length-1;c++)b=""!=$(a[c]).html()?b+($(a[c]).outerHeight(!0)+1):b+1;$("#scrollbar1 .viewport").css("height",b+"px")}):
+a.slideDown(function(){$("#scrollbar1").tinyscrollbar_update()}),c.addClass("hidden"),d.removeClass("hidden")):(!b.parents("td").hasClass(".none")&&!$(".track").is(":visible")&&a.slideUp(function(){$("#scrollbar1").tinyscrollbar_update();for(var b=0,a=0;6>a;a++)b+=$($("#tableList tr")[a]).height();for(var a=$(".overview").children(),c=0;c<a.length-1;c++)b=""!=$(a[c]).html()?b+($(a[c]).outerHeight(!0)+1):b+1;a=b+15;$("#scrollbar1 .viewport").css("height",b+"px");$("#scrollbar1 .viewport").css("*height",
+a+"px")}),a.slideUp(function(){$("#scrollbar1").tinyscrollbar_update()}),c.removeClass("hidden"),d.addClass("hidden"))});$(document).click(function(b){var a=$(b.target),b=a.parents(".performance_trailer").length,a=a.parent(".part_all_show_btn").length;!b&&!a&&$(".check_else").is(":visible")&&($(".check_else").slideUp(function(){$("#scrollbar1").tinyscrollbar_update()}),$(".open_btn").removeClass("hidden"),$(".close_btn").addClass("hidden"))});
+$(".changelabel").click(function(){var b=$(this).attr("targ");$(".motor_ability li").removeClass();$(this).parent().attr("class","cur");$(".m_tab_content").hide();$("#"+b).show()});
+$(".mlabel").click(function(){var b=$(this).attr("targ"),a=b.split("_");"001"==a[1]?($("li[name="+a[0]+"_002]").removeClass(),$("li[name="+a[0]+"_003]").removeClass(),$("li[name="+b+"]").attr("class","cur"),$("#"+a[0]+"_002").hide(),$("#"+a[0]+"_003").hide(),$("#"+b).show()):"002"==a[1]?($("li[name="+a[0]+"_001]").removeClass(),$("li[name="+a[0]+"_003]").removeClass(),$("li[name="+b+"]").attr("class","cur"),$("#"+a[0]+"_001").hide(),$("#"+a[0]+"_003").hide(),$("#"+b).show()):"003"==a[1]&&($("li[name="+
+a[0]+"_001]").removeClass(),$("li[name="+a[0]+"_002]").removeClass(),$("li[name="+b+"]").attr("class","cur"),$("#"+a[0]+"_001").hide(),$("#"+a[0]+"_002").hide(),$("#"+b).show());"004"==a[1]?($("li[name="+a[0]+"_005]").removeClass(),$("li[name="+b+"]").attr("class","cur"),$("#"+a[0]+"_005").hide(),$("#"+b).show()):"005"==a[1]&&($("li[name="+a[0]+"_004]").removeClass(),$("li[name="+b+"]").attr("class","cur"),$("#"+a[0]+"_004").hide(),$("#"+b).show());"006"==a[1]?($("li[name="+a[0]+"_007]").removeClass(),
+$("li[name="+b+"]").attr("class","cur"),$("#"+a[0]+"_007").hide(),$("#"+b).show()):"007"==a[1]&&($("li[name="+a[0]+"_006]").removeClass(),$("li[name="+b+"]").attr("class","cur"),$("#"+a[0]+"_006").hide(),$("#"+b).show())});$(".flashtab").hover(function(){$(this).css("cursor","pointer")});
+$(".flashtab").click(function(){var b=$(this).attr("targ"),a=$(this).text().substring(0,$(this).text().indexOf("度"))+"报";inner=$(".timetable.mt15."+("chart1"==b?"fl":"fr")+" .timetable_year .pd5 .temp");inner.text("("+a+")");$(this).addClass("desc").siblings(".flashtab").removeClass("desc");var c=$(this).index();$(this).parents("thead").next("tbody").children("tr").each(function(){$(this).children("td").eq(c).addClass("objselected").siblings("td").removeClass("objselected")});a=$(this).children(".falshData").html();
+if(!a)return!1;var d=eval("("+a+")"),a=function(a){drawEPSChart(d,b,"error"===a.type?null:this)};$("<img />").load(a).error(a).attr("src","white"==STOCK_SKIN?"http://i.thsi.cn/images/stockpage/new/column.png":"http://i.thsi.cn/images/basic/stock/column.png")});
+function loadFlash(b,a,c){var d=$("#"+b+" thead tr .desc").text(),d=d.substring(0,d.indexOf("度"))+"报";$(".timetable.mt15."+c+" .timetable_year .pd5 .f14.hltip").after('<span class="temp" style="color:\t#A3BDDF">('+d+")</span>");b=$("#"+b+" thead tr").children(".desc").children(".falshData").html();if(!b)return!1;var f=eval("("+b+")"),b=function(b){drawEPSChart(f,a,"error"===b.type?null:this)};$("<img />").load(b).error(b).attr("src","http://i.thsi.cn/images/basic/stock/column.png")}
+function drawEPSChart(b,a,c){if(0!=$("#"+a).length){var d=b[1].reverse(),f=b[0].reverse();for(e=0,h=f.length;e<h;e++)g=parseFloat(f[e][1]),isNaN(g)&&(f[e][1]="");for(var e=0,h=b[1].length;e<h;e++)b[0][e][0]=e,b[1][e][0]=e;h=[f[0]];e=f.slice(0,f.length);h=c?[{data:e,bars:{fillImage:{image:c,gridRect:[60,0,29,130]}}},{data:h,label:"<font size='2'>单位："+decodeURI(b[2])+"</font>",bars:{fillImage:{image:c,gridRect:[30,0,29,130]}}}]:[{data:h,bars:{fillColor:{colors:["#ffd800","#ffa200"]}}},{data:e,bars:{fillColor:{colors:["#28799f",
+"#033898"]}}}];a=$("#"+a);g=0.5;c=0.1;0>=e.length?c=2.5:4>e.length&&(c=0.5*(1-e.length/5));3>e.length&&(g=0.4);var e="white"==STOCK_SKIN?{colors:["#FFFFFF","#EEEEEE"]}:{colors:["#0D151D","#050807"]},i="white"==STOCK_SKIN?"#999999":"#33465A",b=$.plot(a,h,{legend:{show:!1,position:"nw",backgroundOpacity:0,backgroundColor:"transparent"},bars:{show:!0,align:"center",barWidth:g,lineWidth:0,fill:0.9},tooltip:{show:!0,format:"${1}"+decodeURI(b[2])},xaxis:{autoscaleMargin:c,tickLength:0,ticks:d,tickColor:"#232F38"},
+yaxis:{autoscaleMargin:0.25,tickColor:"rgba(30,30,30,0.5)"},grid:{hoverable:!0,backgroundColor:e,borderColor:i,tickColor:"#202020",color:"#A3BDDF",borderWidth:1,markingsLineWidth:1}}),g;for(e=0,h=f.length;e<h;e++)g=parseFloat(f[e][1]),d=b.pointOffset({x:e,y:isNaN(g)?0:g}),isNaN(g)?(c="暂无",i="#525252"):(c=g,i="#0079a4"),c=$('<div style="position:absolute;left:'+(d.left-18)+"px;top:"+(d.top-18)+"px;color:"+i+';padding:2px 5px;font-size:12px;">'+c+"</div>"),a.append(c),c.css({left:d.left-0.5*c.outerWidth()+
+"px",top:Math.max(0,d.top-(0>g?0:c.outerHeight()))+"px"})}}function setCookie(b,a,c){var d=new Date;d.setTime(d.getTime()+864E5*c);document.cookie=b+"="+escape(a)+";expires="+d.toGMTString()+";path=/;domain=.10jqka.com.cn"}function GetCookie(b){for(var b=b+"=",a=b.length,c=document.cookie.length,d=0;d<c;){var f=d+a;if(document.cookie.substring(d,f)==b)return GetCookieVal(f);d=document.cookie.indexOf(" ",d)+1;if(0==d)break}return null}
+function GetCookieVal(b){var a=document.cookie.indexOf(";",b);if(-1==a)a=document.cookie.length;return unescape(document.cookie.substring(b,a))}function analysisDetails(){var b=0,a=$(".cause_analysis").find(".analysis_details"),c=function(){setInterval(function(){b++;if(7>b)a.toggleClass("analysis_details2");else return clearInterval(c)},200)};c()}
+$(document).ready(function(){var b=window.location.href.split("#")[1];b?$(".subnav li").each(function(){var a=$(this).find("a").attr("name");b==a&&$(this).addClass("cur_li").siblings().removeClass("cur_li")}):$("subnav ul li:first").addClass("cur_li");$(".m_box").hover(function(){var b=$(this).attr("id");$(".subnav li").each(function(){var a=$(this).find("a").attr("name");b==a&&$(this).addClass("cur_li").siblings().removeClass("cur_li")})});$(".subnav li a").click(function(){$(this).parent().addClass("cur_li").siblings().removeClass("cur_li")});
+$(".slide_up").click(function(){$(this).addClass("hidden");$(".slide_down").removeClass("hidden");$(".china").show();$(this).parents("#company_point").find(".bd").addClass("hidden")});$(".slide_down").click(function(){$(this).addClass("hidden");$(".slide_up").removeClass("hidden");$(".china").hide();$(this).parents("#company_point").find(".bd").removeClass("hidden")});analysisDetails();$("#tableList").height();$(".track").hide();for(var a=0,c=0;6>c;c++)a+=$($("#tableList tr")[c]).height();for(var c=
+$(".overview").children(),d=0;d<c.length-1;d++)a=""!=$(c[d]).html()?a+($(c[d]).outerHeight(!0)+1):a+12;$("#scrollbar1 .viewport").css("height",a+"px");$("#scrollbar1").tinyscrollbar();$(".part_all_show_btn").delegate(".btndown","click",function(){$(".check_else").hide();$(".open_btn").removeClass("hidden");$(".close_btn").addClass("hidden");$(".track").show();$("#tableList .none").show();$(this).removeClass("btndown").addClass("btnup");for(var b=0,a=0;10>a;a++)b+=$($("#tableList tr")[a]).height();
+for(var a=$(".overview").children(),c=0;c<a.length-1;c++)b=""!=$(a[c]).html()?b+($(a[c]).outerHeight(!0)+1):b+1;$("#scrollbar1 .viewport").css("height",b+"px");$("#scrollbar1").tinyscrollbar_update();if(!1==window.checked)window.checked=!0}).delegate(".btnup","click",function(){$(".check_else").hide();$(".open_btn").removeClass("hidden");$(".close_btn").addClass("hidden");$(".track").hide();$(this).removeClass("btnup").addClass("btndown");$("#tableList .none").hide();$("#scrollbar1 .viewport").css("height",
+a+"px");$("#scrollbar1").tinyscrollbar_update()})});
+//@charset "gbk";
+$(function() {
+    gqzyChart();
+
+    function isXsb() {
+        var stockCode = $('#stockCode').val();
+        stockCode = stockCode.substr(0, 2);
+        if (stockCode == '43' || stockCode == '83') {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    if (isXsb()) {
+        //交易方式翻页
+        if ($('#jyfs_table').length == 1) {
+            var jyfs_sorter = new TINY.table.sorter("jyfs_sorter");
+            jyfs_sorter.pagesize = 6;
+            jyfs_sorter.paginate = true;
+            jyfs_sorter.init("jyfs_table", -1);
+        }
+        //长短内容显示
+        $('.tipbox-ft .btn').live('click', function() {
+            var $thisMaincont = $(this).closest('.maincont');
+            $thisMaincont.hide();
+            $thisMaincont.siblings('.maincont').show();
+        });
+        //获配机构翻页
+        if ($('#hpjg_table').length == 1) {
+            var hpjg_sorter = new TINY.table.sorter("hpjg_sorter");
+            hpjg_sorter.pagesize = 8;
+            hpjg_sorter.paginate = true;
+            hpjg_sorter.init("hpjg_table", -1);
+        }
+        //tipbox3弹框
+        $('.showtipbox3').live('click', function() {
+            if (!$(this).hasClass('m_more_m')) {
+                $('.showtipbox3.m_more_m').trigger('click');
+                $(this).addClass('m_more_m');
+                var t = $(this).position().top + 18;
+                var l = $(this).position().left - 200;
+                $(this).siblings('.rp_tipbox3').css({
+                    'top': t,
+                    'left': l
+                }).slideDown();
+            } else {
+                $(this).removeClass('m_more_m');
+                $(this).siblings('.rp_tipbox3').slideUp();
+            }
+        });
+        $(document).click(function(e) {
+            if ($(e.target).closest('.showtipbox3').length < 1) {
+                $('.showtipbox3.m_more_m').trigger('click');
+            }
+        })
+    }
+    //主力控盘饼图脚本
+    function analysisChart() {
+        var _strData = $("#chartsData").text(),
+            _data = null;
+        try {
+            _data = eval("(" + _strData + ")");
+            for (var i = 0; i < _data.length; i++) {
+                _data[i][1] = parseFloat(_data[i][1]);
+            }
+        } catch (e) {}
+        var bgColor = (STOCK_SKIN == 'white') ? "#FFFFFF" : "#0B1016";
+        var borderColor = (STOCK_SKIN == 'white') ? "#FFFFFF" : "#0B1016";
+        /**
+         * 生成FusionCharts数据(XML)
+         * Enter description here ...
+         */
+        function jsonToXMLData(title, dataArr) {
+            var xmlArr = ['<?xml version="1.0" encoding="UTF-8"?>',
+                    '<chart palette="1"',
+                    'caption="', title, '"',
+                    'startingAngle="90"',
+                    'showValues="0"',
+                    'pieRadius="60"',
+                    'bgColor="', bgColor, '"',
+                    'showBorder="1"',
+                    'borderColor="', borderColor, '"',
+                    'baseFontSize="12"',
+                    'baseFontColor="8194A7"',
+                    'bgAlpha="100"',
+                    'canvasBgColor="0B1016"',
+                    'borderAlpha="100"',
+                    'enableRotation="1"',
+                    '>'
+                ],
+                i = 0,
+                len = dataArr.length,
+                item;
+
+            for (i = 0; i < len; i++) {
+                item = dataArr[i];
+                xmlArr.push('<set value="', item[1], '" name="', item[0], '"></set>');
+            }
+            xmlArr.push('</chart>');
+            return xmlArr.join("");
+        }
+
+        function embedFlash(id, data) {
+            var htmlArr = ['<object width="100%" height="100%" ',
+                (($.browser.msie) ? '' : 'data="http://i.thsi.cn/flash/basic/stock/Pie2D2.swf"'),
+                'id="chart', id, '" type="application/x-shockwave-flash">',
+                '<param value="http://i.thsi.cn/flash/basic/stock/Pie2D2.swf" name="movie">',
+                '<param value="dataXML=', encodeURI(data), '" name="flashvars">',
+                '<param value="', bgColor, '" name="bgColor">',
+                '<param value="high" name="quality">',
+                '<param value="opaque" name="wmode">',
+                '</object>'
+            ];
+
+            if ($("#chartWrap").get(0)) {
+                $("#chartWrap").get(0).innerHTML = htmlArr.join("");
+            }
+        }
+
+        function setChart() {
+            if (!_data) return;
+            xmlData = jsonToXMLData("流通盘占比", _data);
+            if (xmlData) {
+                embedFlash('only', xmlData);
+            }
+        }
+        //setChart();
+
+        function drawCharts(chartId, chartData) {
+            var bgcolor = STOCK_SKIN == 'white' ? '#fff' : '#0b1016';
+            var borderWidth = chartData.length == 1 ? 0 : 1;
+            //处理小于1%的情况
+            var sum = 0,
+                oldChartData = jQuery.extend(true, {}, chartData);
+            for (var i = 0; i < chartData.length; i++) {
+                sum += chartData[i][1];
+            }
+            for (var i = 0; i < chartData.length; i++) {
+                if ((chartData[i][1] / sum) < 0.01) {
+                    chartData[i][1] = sum * 0.01;
+                }
+            }
+            //处理数据颜色
+            var newChartData = [];
+            var colors = ['#f6c11d', '#92be0f', '#ff9451', '#0f9494', '#d85151', '#b3daf8'];
+            for (var i = 0; i < chartData.length; i++) {
+                var color = (chartData.length < 6 && i == chartData.length - 1) ? colors[colors.length - 1] : colors[i];
+                var tempObj = {
+                    'name': chartData[i][0],
+                    'y': chartData[i][1],
+                    'color': color
+                };
+                newChartData.push(tempObj);
+            }
+            $('#' + chartId).highcharts({
+                chart: {
+                    backgroundColor: bgcolor,
+                    plotBorderWidth: 0
+                },
+                title: null,
+                tooltip: {
+                    formatter: function() {
+                        var index = this.point.index;
+                        var pcent = (oldChartData[index][1] / sum * 100).toFixed(2);
+                        return '<b>' + this.point.name + '</b><br/>占比:' + pcent + '%';
+                    }
+                },
+                credits: {
+                    enabled: false
+                },
+                plotOptions: {
+                    pie: {
+                        borderWidth: borderWidth,
+                        allowPointSelect: true,
+                        cursor: 'pointer',
+                        dataLabels: {
+                            enabled: false
+                        }
+                    }
+                },
+                series: [{
+                    type: 'pie',
+                    data: newChartData
+                }]
+            });
+        }
+        drawCharts('chartmain', _data);
+    }
+    analysisChart();
+
+    //标签点击和hover事件
+    $('.f10_label_icon .f10_label_r,.f10_label_icon .f10_label_iconr').hover(
+        function() {
+            $('.f10_label_icon').addClass('f10_label_icon_hv');
+        },
+        function() {
+            $('.f10_label_icon').removeClass('f10_label_icon_hv');
+        }
+    );
+    $('.f10_label_icon .f10_label_r,.f10_label_icon .f10_label_iconr').click(function() {
+        $('.f10_label_box').show();
+        $('.f10_label_box .cont').attr('tag', '-1');
+        $('.f10_label_box .arr_next').trigger('click');
+    });
+    $('.f10_label_box .close').live('click', function() {
+        $('.f10_label_box').hide();
+    });
+    $('.f10_label_box .arr_prev, .f10_label_box .arr_next').live('click', function() {
+        var $table = $('.f10_label_box .cont table');
+        var tag = parseInt($('.f10_label_box .cont').attr('tag'));
+        tag = $(this).is('.arr_prev') ? tag - 1 : tag + 1;
+        $('.f10_label_box .cont').attr('tag', tag);
+        $table.hide().eq(tag).show();
+        initArr(tag);
+    });
+
+    function initArr(tag) {
+        var $table = $('.f10_label_box .cont table');
+        tag == $table.length - 1 ? $('.f10_label_box .arr_next').hide() : $('.f10_label_box .arr_next').show();
+        tag == 0 ? $('.f10_label_box .arr_prev').hide() : $('.f10_label_box .arr_prev').show();
+        var divH = ($table.closest('.cont').height() - 31) / 2;
+        $('.f10_label_box .arr_prev, .f10_label_box .arr_next').css('top', divH);
+
+    }
+
+    $('.fBox_trigger').click(function() {
+        TA.log({ 'id': 'f10_stock_index_financetab', 'nj': 1 });
+        var tag = parseInt($(this).attr('tag'));
+        var top = $(this).position().top + 22;
+        var right = 940 - $(this).position().left - $(this).width() - 11;
+        $('.financeBox').css('top', top).show();
+        $('.financeBox').find('.arrow').css('right', right);
+        $('.financeBox').find('.tabCont').hide().eq(tag).show();
+    });
+    $(document).click(function(e) {
+        if ($(e.target).closest('.fBox_trigger').length < 1 && $(e.target).closest('.financeBox').length < 1) {
+            $('.financeBox').hide();
+        }
+    });
+    //表格形式的翻页
+    $('.pagernav a').click(function() {
+        $(this).parents('li').addClass('cur').siblings().removeClass('cur');
+    });
+
+    function tableMove(tableid, pageNumber, itemsOnPage) {
+        var $trs = $('#' + tableid).find('tbody .J-mod-items');
+        var startPos = (pageNumber - 1) * itemsOnPage;
+        var endPos = pageNumber * itemsOnPage;
+        $trs.each(function(i) {
+            var index = i + 1;
+            $(this).hide();
+            if (index > startPos && index <= endPos) {
+                $(this).show();
+            }
+        });
+    }
+
+    //+，-展开收起
+    $('.insdata_table .m_more').live('click', function() {
+        $('.insdata_table .m_more').each(function() {
+            $(this).hasClass('m_more_m') ? $(this).removeClass('m_more_m') : '';
+        });
+        $(this).addClass('m_more_m');
+    });
+    $('.insdata_table .m_more_m').live('click', function() {
+        $(this).removeClass('m_more_m');
+    });
+    //电影名称弹窗
+    var popTimer;
+    $('.insdata_table .popbtn').live('mouseenter', function() {
+        clearTimeout(popTimer);
+        var idx = $('.insdata_table .popbtn').index($(this));
+        var top = $(this).position().top + 22;
+        $('.movie_pop_box .popmain').hide().eq(idx).css('top', top).show();
+    }).live('mouseleave', function() {
+        popTimer = setTimeout(function() {
+            $('.movie_pop_box .popmain').hide();
+        }, 200);
+    });
+    $('.movie_pop_box .popmain').live('mouseenter', function() {
+        clearTimeout(popTimer);
+    }).live('mouseleave', function() {
+        popTimer = setTimeout(function() {
+            $('.movie_pop_box .popmain').hide();
+        }, 200);
+    });
+    //电影+，-展开收起
+    $('#movie_table .m_more').live('click', function() {
+        var $div = $('#movie_table').parent();
+        $div.find('.movieline-box').hide();
+        var data = $(this).parent().prev().html();
+        data = eval('(' + data + ')');
+        var top = $(this).parents('td').position().top + 28;
+        var left = $(this).parents('td').position().left - 75;
+        $('#movie_table').parent().find('.movieline-box').remove();
+        if (!!data) {
+            var name = data.title;
+            var unit = data.unit;
+            var html = '<div class="movieline-box">' +
+                '<p>' + name + '&nbsp;累计票房跟踪</p>' +
+                '<div class="unit">单位：' + unit + '</div>' +
+                '<div class="charts"></div>' +
+                '</div>';
+            $div.append(html);
+            drawMovieCharts($div.find('.movieline-box').find('.charts'), data);
+            $('#movie_table').parent().find('.movieline-box').css({
+                'top': top,
+                'left': left
+            }).show();
+        }
+    });
+    $('#movie_table .m_more_m').live('click', function() {
+        $('#movie_table').parent().find('.movieline-box').hide();
+        return false;
+    });
+    //票房折线图
+    function drawMovieCharts($chartElem, data) {
+        var bgcolor = STOCK_SKIN == 'white' ? '#fff' : '#050707';
+        var labelsColor = STOCK_SKIN == 'white' ? '#333' : '#ccc';
+        var tickColor = STOCK_SKIN == 'white' ? '#333' : '#050707';
+        var chartsData = data.chartsdata;
+        var unit = data.unit;
+        var categories = [];
+        for (var i = 0; i < chartsData.length; i++) {
+            categories.push(chartsData[i][0]);
+        }
+        Highcharts.setOptions({
+            lang: {
+                thousandsSep: ''
+            }
+        });
+        $chartElem.highcharts({
+            chart: {
+                backgroundColor: bgcolor,
+                plotBorderWidth: 0,
+                marginRight: 40,
+                events: {
+                    load: function() {
+                        $('.highcharts-xaxis-labels').each(function() {
+                            var $text = $(this).find('text');
+                            if ($text.find('tspan')) {
+                                $text.html($text.find('title').html())
+                            }
+                        });
+                    }
+                }
+            },
+            colors: ['#947803'],
+            title: null,
+            tooltip: {
+                shared: true,
+                useHTML: true,
+                headerFormat: '<div style="padding-top: 5px;">',
+                pointFormat: '<span>{point.name}：{point.y}' + unit + '</td></span>',
+                footerFormat: '</div>'
+                    /*formatter: function() {
+                        //return '<span>'+ this.point.name +'：<br/>'+this.point.y+unit+'</span>';
+                    }*/
+            },
+            credits: {
+                enabled: false
+            },
+            plotOptions: {
+                series: {
+                    marker: {
+                        radius: 0.5 //曲线点半径，默认是4
+                    }
+                }
+            },
+            xAxis: {
+                lineColor: '#344459',
+                tickColor: tickColor,
+                labels: {
+                    formatter: function() {
+                        return this.value;
+                    },
+                    style: {
+                        color: labelsColor
+                    }
+                },
+                maxPadding: 0.5,
+                tickInterval: categories.length - 1,
+                categories: categories
+            },
+            yAxis: {
+                title: {
+                    text: ''
+                },
+                lineColor: '#344459',
+                gridLineWidth: 0,
+                lineWidth: 1,
+                labels: {
+                    format: '{value} ',
+                    style: {
+                        color: labelsColor
+                    }
+                }
+            },
+            legend: {
+                enabled: false
+            },
+            series: [{
+                type: 'line',
+                data: chartsData
+            }]
+        });
+    }
+    //楼盘折线图
+    function drawLineCharts($chartElem, data, time) {
+        var bgcolor = STOCK_SKIN == 'white' ? '#fff' : '#0b1016';
+        var colors = STOCK_SKIN == 'white' ? '#fcc971' : '#947803';
+        var alternateGridColor = STOCK_SKIN == 'white' ? '#ebebeb' : '#282c32';
+        var labelsColor = STOCK_SKIN == 'white' ? '#333' : '#ccc';
+        var lineColor = STOCK_SKIN == 'white' ? '#fff' : '#0b1016';
+        var chartsData = data[time];
+        var unit = data.unit;
+        var categories = [];
+        var tickInterval = 1;
+        var max = 0;
+        if (!chartsData) {
+            $('.charts_blank').show();
+            $('.charts_box').hide();
+            return false;
+        } else {
+            $('.charts_blank').hide();
+            $('.charts_box').show();
+        }
+        for (var i = 0; i < chartsData.length; i++) {
+            categories.push(chartsData[i][0])
+            max = max < chartsData[i][1] ? chartsData[i][1] : max;
+        }
+        tickInterval = Math.floor(max / 4);
+        $chartElem.highcharts({
+            chart: {
+                backgroundColor: bgcolor,
+                plotBorderWidth: 0
+            },
+            colors: [colors],
+            title: null,
+            tooltip: {
+                formatter: function() {
+                    return '<span>' + this.point.name + '：' + this.point.y + unit + '</span>';
+                }
+            },
+            credits: {
+                enabled: false
+            },
+            xAxis: {
+                lineColor: lineColor,
+                tickColor: lineColor,
+                labels: {
+                    style: {
+                        color: labelsColor
+                    }
+                },
+                categories: categories
+            },
+            yAxis: {
+                title: {
+                    text: ''
+                },
+                alternateGridColor: alternateGridColor,
+                tickInterval: tickInterval,
+                lineColor: lineColor,
+                gridLineWidth: 0,
+                lineWidth: 1,
+                labels: {
+                    style: {
+                        color: labelsColor
+                    }
+                }
+            },
+            legend: {
+                enabled: false
+            },
+            series: [{
+                type: 'line',
+                data: chartsData
+            }]
+        });
+    }
+
+    function showRealtyTab(time) {
+        $('.realty_table').hide();
+        $('#realty_table_' + time).show();
+    }
+    //选择图表日期
+    $('#dateSelect_realty .m_select .text').click(function() {
+        $(this).parents('.m_select').find('.list').show();
+    });
+    $('#dateSelect_realty .tableTab').click(function() {
+        var tag = $(this).attr('tag');
+        $(this).parents('.m_select').find('.text').attr('tag', tag).find('span').html($(this).html());
+        $(this).parents('.list').hide();
+        var time = $('.m_year').attr('tag') + '-' + $('.m_mouth').attr('tag');
+        drawLineCharts($('#charts_realty'), realtyData, time);
+        showRealtyTab(time);
+    });
+
+    //城市详细表格
+    $('.realty_table .m_more').live('click', function() {
+        $('.realty_table .realty_pop').hide();
+        $(this).parent().find('.realty_pop').show();
+        $(this).addClass('m_more_m');
+    });
+    $('.realty_table .m_more_m').live('click', function() {
+        $(this).removeClass('m_more_m');
+        $(this).parent().find('.realty_pop').hide();
+        return false;
+    });
+    //页面点击隐藏操作
+    $(document).click(function(e) {
+        if ($(e.target).closest('.fixedw').length < 1) {
+            $('.fixedw .realty_pop').hide();
+            $('.fixedw .m_more_m').removeClass('m_more_m');
+        } else {
+            return false;
+        }
+        if ($(e.target).closest('.movieline-box').length < 1 && !$(e.target).is('.fixedw .m_more')) {
+            $('.movieline-box').hide();
+            $('.fixedw .m_more_m').removeClass('m_more_m');
+        }
+        if ($(e.target).closest('.m_select').length < 1) {
+            $('#dateSelect_realty .list').hide();
+        }
+    });
+
+    //页面初始化
+    function init() {
+        if ($('.realty_table').length > 0) {
+            var time = $('#dateSelect_realty .m_year').attr('tag') + '-' + $('#dateSelect_realty .m_mouth').attr('tag');
+            realtyData = $('#charts_realty_data').html();
+            realtyData = eval('(' + realtyData + ')');
+            drawLineCharts($('#charts_realty'), realtyData, time);
+            showRealtyTab(time);
+        }
+        if ($('.insdata_table').length > 0) {
+            //initModPager($('.J-mod-pager'),5);
+            //五页翻页
+            $(document).ready(function() {
+                var pagecount = Math.ceil($('#movie_table .J-mod-items').length / 5);
+                $("#insdata_pager").pager({ pagenumber: 1, pagecount: pagecount, buttonClickCallback: PageClick });
+            });
+            PageClick = function(pageclickednumber) {
+                $('.movieline-box').hide();
+                var pagecount = Math.ceil($('#movie_table .J-mod-items').length / 5);
+                $("#insdata_pager").pager({ pagenumber: pageclickednumber, pagecount: pagecount, buttonClickCallback: PageClick });
+                tableMove('movie_table', pageclickednumber, 5);
+            }
+
+        }
+    }
+
+
+    // 股权质押折线图
+    function gqzyChart() {
+        var strData = $('.gqzy.falshData').html(); // 获取节点中的数据
+        if (strData == '') {
+            return;
+        }
+        var chartsData = JSON.parse(strData);
+        var categories = chartsData[1];
+        var yValue = [];
+        var strY = chartsData[0];
+        for (var i = 0; i < strY.length; i++) {
+            yValue.push(parseFloat(strY[i]))
+        }
+        var bgcolor = STOCK_SKIN == 'white' ? '#fff' : '#0b1016';
+        var colors = STOCK_SKIN == 'white' ? '#fcc971' : '#947803';
+        var alternateGridColor = STOCK_SKIN == 'white' ? '#ebebeb' : '#282c32';
+        var labelsColor = STOCK_SKIN == 'white' ? '#333' : '#ccc';
+        var lineColor = STOCK_SKIN == 'white' ? '#fff' : '#0b1016';
+        var gridColor = STOCK_SKIN == 'white' ? '#a7a7a7' : '#121415';
+        var $chartElem = $('#zzygfzx');
+        $chartElem.highcharts({
+            chart: {
+                backgroundColor: bgcolor,
+                plotBorderWidth: 0
+            },
+            colors: [colors],
+            title: null,
+            tooltip: {
+                formatter: function() {
+                    return '<span>' + this.point.category + '：' + this.point.y + '%</span>';
+                }
+            },
+            credits: {
+                enabled: false
+            },
+            plotOptions: {
+                series: {
+                    dataLabels: {
+                        enabled: true,
+                        color: labelsColor,
+                        style: {
+                            fontWeight: 100
+                        },
+                        formatter: function() {
+                            return this.y + '%'
+                        }
+                    }
+                }
+            },
+            xAxis: {
+                lineColor: lineColor,
+                tickColor: lineColor,
+                tickInterval: 11,
+                lineWidth: 2,
+                labels: {
+                    style: {
+                        color: labelsColor
+                    }
+                    // formatter: function() {
+                    //     if (this.isFirst || this.isLast) {
+                    //         return this.value
+                    //     }
+                    // }
+                },
+                categories: categories
+            },
+            yAxis: {
+                title: {
+                    text: ''
+                },
+                // alternateGridColor: alternateGridColor,
+                // tickInterval: tickInterval,
+                lineColor: lineColor,
+                gridLineWidth: 1,
+                gridLineColor: gridColor,
+                lineWidth: 1,
+                labels: {
+                    style: {
+                        color: labelsColor
+                    }
+                }
+            },
+            legend: {
+                enabled: false
+            },
+            series: [{
+                type: 'line',
+                data: yValue,
+                marker: {
+                    fillColor: 'white',
+                    lineWidth: 4,
+                    lineColor: colors
+                }
+            }]
+        });
+    }
+
+    init();
+
+})/*gdr  quote */
+if ($("#compare").length>0) {
+	var stockcode = $("#stockCode").val();
+	$.ajax({
+		type: "POST",
+		url : "http://basic.10jqka.com.cn/ajax/getGdrQuote.php",
+		data: {acode:stockcode},
+		success:function(data){
+			var ret=JSON.parse(data)
+			var html = '<thead>';
+			html += '<tr>';
+			html += '<th>指标</th>';
+			html += '<th>A股('+ret['data']['adate']+')</th>';
+			html += '<th>GDR('+ret['data']['udate']+')</th></tr>';
+			html += '</thead>';
+			html += '<tbody>';
+			html += '<tr>';
+			html += '<th class="tl">代码</th>';
+			html += '<td class="tr">'+ret['data']['acode']+'</td>';
+			html += '<td class="tr">'+ret['data']['ucode']+'</td>';
+			html += '</tr>';
+			html += '<tr>';
+			html += '<th class="tl">股价</th>';
+			html += '<td class="tr">'+ret['data']['axj']+'元/股</td>';
+			html += '<td class="tr">'+parseFloat(ret['data']['uxj']*ret['data']['hl']/ret['data']['gdrrate']).toFixed(2)+'元/股</td>';
+			html += '</tr>';
+			html += '<tr>';
+			html += '<th class="tl">涨跌幅</th>';
+			if (ret['data']['azdf']>0) {
+				html += '<td class="tr"><span class="upcolor">'+parseFloat(ret['data']['azdf']).toFixed(2)+'%</span></td>';
+			} else {
+				if (ret['data']['azdf']<0) {
+					html += '<td class="tr"><span class="downcolor">'+parseFloat(ret['data']['azdf']).toFixed(2)+'%</span></td>';
+				} else {
+					html += '<td class="tr">'+parseFloat(ret['data']['azdf']).toFixed(2)+'%</td>';
+				}
+			}
+			if (ret['data']['uzdf']>0) {
+				html += '<td class="tr"><span class="upcolor">'+parseFloat(ret['data']['uzdf']).toFixed(2)+'%</span></td>';
+			} else {
+				if (ret['data']['uzdf']<0) {
+					html += '<td class="tr"><span class="downcolor">'+parseFloat(ret['data']['uzdf']).toFixed(2)+'%</span></td>';
+				} else {
+					html += '<td class="tr">'+parseFloat(ret['data']['uzdf']).toFixed(2)+'%</td>';
+				}
+			}
+			html += '</tr>';
+			html += '<tr>';
+			html += '<th class="tl">成交额</th>';
+			html += '<td class="tr">'+unitchange(ret['data']['acje'])+'元</td>';
+			html += '<td class="tr">'+unitchange(ret['data']['ucje']*ret['data']['hl'])+'元</td>';
+			html += '</tr>';
+			html += '<tr>';
+			html += '<th class="tl">TTM市盈率</th>';
+			html += '<td class="tr">'+parseFloat(ret['data']['asyl']).toFixed(2)+'</td>';
+			html += '<td class="tr">'+parseFloat(ret['data']['usyl']).toFixed(2)+'</td>';
+			html += '</tr>';
+			html += '</tbody>';
+			$(".compare").html(html);
+			html = '<div>备注：GDR已做同单位同币种处理，转换比例为'+parseFloat(ret['data']['gdrrate'])+'股A股=1份GDR，采用汇率为1美元='
+			+parseFloat(ret['data']['hl'])+'人民币</div>';
+			$(".compare").after(html);
+			$(".compare").attr('class', 'compare m_table m_hl');
+		}
+	});
+	function unitchange(data)
+	{
+		unit = ''; 
+		value = data;
+		if (data > 1000000000000) {
+            unit = '万亿'; //
+            value = parseFloat(data/1000000000000).toFixed(2);
+        } else {
+            if (data > 100000000) {
+				unit = '亿'; //
+				value = parseFloat(data/100000000).toFixed(2);
+            } else {
+                if (data > 10000) {
+                    unit = '万'; //
+					value = parseFloat(data/10000).toFixed(2);
+                } 
+            }
+        }
+		return value+unit;
+	}
+}

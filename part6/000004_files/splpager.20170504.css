@@ -1,0 +1,16 @@
+@charset "gbk";
+#pub .m_dlbox dl{width: 100%}
+.splpager{text-align: center;margin-top: 10px;font:12px/1.5 tahoma;}
+.splpager ul{display: inline-block;*zoom: 1;*display:inline;}
+.splpager li{float: left;}
+.splpager a,.splpager span{background-color:#1B2938;border-radius:1px;border:1px solid #344459;color:#ccc;display:inline-block;margin-left:6px;padding:0 7px;text-decoration:none;vertical-align:middle;}
+.splpager a:hover,.splpager span:hover{background-color:#344459;border-top:1px solid #344459;color:#FFB400;text-decoration:none;}
+.splpager .disabled span{background-color:#0f1720;border-color:#393939;color:#999999;}
+.splpager .disabled span:hover{background-color:#0f1720;border-color:#393939;color:#999999;cursor:default;}
+.splpager .active .current, .splpager .active .current:hover{background-color:#344459;border-top:1px solid #344459;color:#FFB400;text-decoration:none;font-weight: 700;}
+#liftban .gd_ques{
+    text-align:center;
+    float:right;
+    margin-top:2px;
+}
+

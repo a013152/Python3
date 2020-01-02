@@ -1,0 +1,149 @@
+//@charset "utf-8";
+var scrollListenArr = [];
+var hoverEvent, adEvent, clickEvent;
+var totalPageId = getTotalPageId();
+
+function getTotalPageId() {
+    var tid = '';
+    var cate = $('#catecode').val();
+    switch (cate) {
+        case 'index':
+            tid = 'zxdt';
+            break;
+        case 'company':
+            tid = 'gszl';
+            break;
+        case 'holder':
+            tid = 'gdyj';
+            break;
+        case 'operate':
+            tid = 'jyfx';
+            break;
+        case 'equity':
+            tid = 'gbjg';
+            break;
+        case 'capital':
+            tid = 'zbyz';
+            break;
+        case 'worth':
+            tid = 'ylyc';
+            break;
+        case 'news':
+        case 'newset':
+            tid = 'xwgg';
+            break;
+        case 'concept':
+            tid = 'gntc';
+            break;
+        case 'position':
+            tid = 'zlcc';
+            break;
+        case 'finance':
+            tid = 'cwgk';
+            break;
+        case 'bonus':
+            tid = 'fhrz';
+            break;
+        case 'event':
+            tid = 'gsds';
+            break;
+        case 'field':
+            tid = 'hydb';
+            break;
+        case 'dupont':
+            tid = 'dbfx';
+            break;
+        case 'mine':
+            tid = 'news';
+            break;
+        case 'pub':
+            tid = 'gonggao';
+            break;
+        case 'report':
+            tid = 'yanbao';
+            break;
+        case 'interactive':
+            tid = 'hudong';
+            break;
+        default:
+            tid = '';
+            break;
+    }
+    return 'f10_' + tid + '_' + $('#stockCode').val();
+}
+
+var taScrollListen = function() {
+    //滚动监听
+    $(document).on('scroll', function() {
+        var taid = '',
+            itemPos = 0,
+            itemHeight = 0,
+            windowHeight = $(window).height(),
+            scrollHeight = $(document).scrollTop();
+        for (var k in scrollListenArr) {
+            var $curTag = $('#' + scrollListenArr[k]['id'] + "-listen");
+            if ($curTag.hasClass('scroll-ta-over') || $curTag.length < 1) continue;
+            itemPos = $curTag.offset().top;
+            itemHeight = $curTag.outerHeight();
+            if (scrollHeight < itemPos && scrollHeight + windowHeight >= itemPos + itemHeight / 2) {
+                var tid = scrollListenArr[k]['id'];
+                TAN.log({ id: totalPageId + "-" + tid + "-all-view-0-0", ifjump: '0', url_ver: 'THSNEWS-7004', backcolor: STOCK_SKIN });
+                $curTag.addClass('scroll-ta-over');
+            }
+        }
+    });
+}
+
+$(document).ready(function() {
+    if (typeof(TAN) != 'undefined') {
+        if ($('.fid-scroll-box').length > 0) {
+            $('.fid-scroll-box').each(function() {
+                var res = [];
+                res['id'] = $(this).attr('scroll-fid');
+                if (res['id']) {
+                    scrollListenArr.push(res);
+                }
+            });
+            if (scrollListenArr.length > 0) {
+                taScrollListen();
+            }
+        }
+    }
+    TAN.log({ id: totalPageId + '-show', ifjump: '0', 'nj': 1, url_ver: 'THSNEWS-7004', backcolor: STOCK_SKIN });
+
+    //导航栏点击统计
+    $('.header a[posid]').click(function() {
+        var posid = $(this).attr('posid');
+        var tid = $(this).attr('tid');
+        TAN.log({ id: totalPageId + "-switch-" + posid + "-click-sta-" + tid, ifjump: '1', 'nj': 1, url_ver: 'THSNEWS-7004', backcolor: STOCK_SKIN });
+    });
+
+
+    $(".newtaid").click(function() {
+        if ($(this).hasClass('skipto') && window.location.href.indexOf('stockpage') !== -1) {
+            return false
+        }
+        var newtaid = $(this).attr('newtaid');
+        if (newtaid) {
+            var code = $('#stockCode').val();
+            var ver = $(this).attr('ver');
+            var jump = $(this).attr('ifjump');
+            newtaid = newtaid.replace('code', code);
+            if (!ver) {
+                ver = 'KMJB-1008';
+            }
+            if (jump) {
+                jump = '1';
+            } else {
+                jump = '0';
+            }
+            if (newtaid.indexOf('expand') > -1) {
+                $(this).attr('newtaid', newtaid.replace('expand', 'fold'));
+            }
+            if (newtaid.indexOf('fold') > -1) {
+                $(this).attr('newtaid', newtaid.replace('fold', 'expand'));
+            }
+            TAN.log({ id: newtaid, ifjump: jump, url_ver: ver, backcolor: STOCK_SKIN });
+        }
+    });
+});

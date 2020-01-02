@@ -1,0 +1,48 @@
+
+
+#scrollbar1 .viewport{
+    height:168px;
+    overflow: hidden;
+    position: relative;
+}
+
+#scrollbar1 .scrollbar {
+   position: absolute;
+    background-position: 0 0;
+    right: 20px;
+    width: 8px;
+    z-index: 99;
+  /*background: transparent;*/
+}
+#scrollbar1 .overview{
+    /*list-style: none;*/
+    position: absolute;
+    left: 0;
+    top: 0;
+    padding: 0;
+    margin: 0;
+    width:900px
+}
+#scrollbar1 .thumb {
+    background: #6C6E71;
+    height: 20px;
+    width: 8px;
+    cursor: pointer;
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-radius: 4px;
+}
+#scrollbar1 .track {
+    background: rgb(5, 7, 7);
+    width: 8px;
+}
+.scrollWrap{
+    background: #0b1016;
+    padding: 20px;
+    overflow:hidden
+}
+.index_equity_style{background: #0b1016}
+.remind_pubnote{height: 14px;width: 14px;background-position: -163px -369px;display: inline-block;vertical-align: middle;}
+

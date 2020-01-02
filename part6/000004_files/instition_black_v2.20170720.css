@@ -1,0 +1,309 @@
+/*工商数据*/
+
+.gssj_scroll {
+    z-index: 999;
+}
+
+.ggintro th a {
+    cursor: default;
+    vertical-align: center
+}
+
+#holdetail .gd_ques {
+    top: 0px\9;
+}
+
+#holdetail .gd_ques {
+    *vertical-align: baseline
+}
+
+
+/*.ggintro th.holder_th {
+    background: #050707
+}*/
+
+.gssj_scroll1 {
+    z-index: 9999;
+}
+
+.gssj_scroll .m_table td {
+    text-align: left;
+}
+
+.gssj_scroll .institionName {
+    cursor: pointer;
+    color: #0199fa;
+    text-decoration: underline;
+}
+
+.gssjBox .no_info {
+    position: relative;
+    left: 120px;
+    top: -10px;
+    color: #ffb400;
+}
+
+.scrollbar1 {
+    overflow: auto;
+    height: 140px;
+}
+
+.institionName {
+    color: #0199fa;
+    text-decoration: underline;
+}
+
+.gssj_scroll .tbody {
+    position: relative;
+}
+
+.gssj_scroll .gssjBox {
+    width: 310px;
+    position: absolute;
+    left: 80px;
+    top: 200px;
+    z-index: 999;
+    overflow: hidden;
+    zoom: 1;
+    padding: 30px 10px 10px;
+    border: 5px solid #344459;
+    background: #1d2531;
+}
+
+.gssj_scroll .hidden {
+    display: none;
+}
+
+.gssjBox .close {
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    margin: 0;
+    font-family: \5B8B\4F53;
+    font-size: 18px;
+    color: #fafafa;
+    z-index: 201;
+    text-decoration: none;
+    border: 0;
+    cursor: pointer;
+}
+
+.gssjBox .componyInfo {
+    color: #c9ccd1;
+}
+
+.gssjBox .info_titie {
+    font-size: 14px;
+    font-weight: 600;
+    margin: -15px 5px 10px;
+}
+
+.gssjBox h3 {
+    font-size: 16px;
+    color: #f6c217;
+    text-align: left;
+    margin: 5px 5px 15px;
+}
+
+.gssjBox h4 {
+    font-size: 12px;
+    margin: 1.5px;
+    font-weight: 400;
+}
+
+.gssjBox .gong_info_more {
+    position: absolute;
+    top: 115px;
+    right: 16px;
+    margin: 0;
+    font-family: \5B8B\4F53;
+    font-size: 12px;
+    color: #0199fa;
+    text-decoration: none;
+    border: 0;
+    cursor: pointer;
+}
+
+.gssjBox .detail_info_box {
+    overflow: hidden;
+    width: 100%;
+    height: auto;
+    border: 1px solid #33435a;
+    background: #060807;
+    margin-top: 20px;
+}
+
+.gssjBox .detail_info_box ul {
+    overflow: hidden;
+}
+
+.gssjBox .detail_info_box li {
+    float: left;
+    height: 28px;
+    width: 102px;
+    text-align: center;
+    font-size: 12px;
+    border-bottom: 1px solid #33435a;
+    border-right: 1px solid #33435a;
+    line-height: 28px;
+    cursor: pointer;
+}
+
+.gssjBox .detail_info_box .li_zycy {
+    border-right: 0;
+}
+
+.gssjBox .detail_info_box .cur {
+    border-bottom: none;
+    font-weight: 600;
+}
+
+.gssjBox .detail_info_box .detail_info {
+    /*overflow: hidden;*/
+    background: #1d2532;
+    margin: 10px;
+    box-sizing: border-box;
+    position: relative;
+}
+
+
+/*对外投资*/
+
+.gssjBox .detail_info_box .dwtz {
+    display: none;
+    padding: 1px;
+}
+
+.detail_info_box .detail_info p {
+    margin: 13px 15px 10px;
+    font-size: 12px;
+}
+
+.detail_info_box .detail_info h5 {
+    margin: 8px 15px;
+    font-size: 14px;
+    color: #f6c217;
+    font-weight: 400;
+}
+
+.detail_info_box .dwtz .icon {
+    width: 10px;
+    height: 5px;
+    background: url('http://i.thsi.cn/images/basic/stock/i-1-black.jpg') no-repeat;
+    position: absolute;
+    left: 140px;
+    top: -5px;
+}
+
+.detail_info_box .dwtz h6 {
+    color: #f6c217;
+    padding-left: 10px;
+    padding-bottom: 5px;
+}
+
+
+/*股东*/
+
+.gssjBox .holder table {
+    width: 100%;
+}
+
+.gssjBox .detail_info_box table tr td {
+    background: #1d2532;
+    border: 0;
+    text-align: left;
+}
+
+.gssjBox .detail_info_box .detail_info table tr th {
+    text-align: left;
+    border: 0;
+    background: #1d2532;
+    color: #c9ccd1;
+    text-decoration: none;
+}
+
+.gssjBox .detail_info_box .holder {
+    display: block;
+    padding: 5px;
+}
+
+.detail_info_box .holder .name {
+    width: 70%;
+    font-size: 12px;
+    height: 30px;
+}
+
+.detail_info_box .holder .type {
+    width: 30%;
+    font-size: 12px;
+    height: 30px;
+}
+
+.gssjBox .zycy table {
+    width: 100%;
+}
+
+.detail_info_box .zycy .name {
+    width: 45%;
+    font-size: 12px;
+    height: 30px;
+}
+
+.detail_info_box .zycy .type {
+    width: 55%;
+    font-size: 12px;
+    height: 30px;
+}
+
+.detail_info_box .holder .icon {
+    width: 10px;
+    height: 5px;
+    background: url('http://i.thsi.cn/images/basic/stock/i-1-black.jpg') no-repeat;
+    position: absolute;
+    left: 40px;
+    top: -5px;
+}
+
+
+/*主要成员*/
+
+.gssjBox .detail_info_box .zycy {
+    display: none;
+}
+
+.detail_info_box .zycy .zycy-left {
+    float: left;
+    width: 45%;
+    background: #1d2532;
+    margin-bottom: 10px;
+}
+
+.detail_info_box .zycy .zycy-right {
+    float: right;
+    width: 55%;
+    background: #1d2532;
+    margin-bottom: 10px;
+}
+
+.detail_info_box .zycy .icon {
+    width: 10px;
+    height: 5px;
+    background: url('http://i.thsi.cn/images/basic/stock/i-1-black.jpg') no-repeat;
+    position: absolute;
+    left: 240px;
+    top: -5px;
+}
+
+.detail_info_box .zycy h6 {
+    color: #f6c217;
+    padding-left: 10px;
+    padding-bottom: 5px;
+}
+
+
+/*滚动条样式*/
+
+.gssjBox .scrollbar1 .mCSB_scrollTools .mCSB_dragger_bar {
+    background-color: #6C6E71;
+    width: 8px;
+}

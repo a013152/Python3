@@ -1,0 +1,646 @@
+//@charset "gbk"
+//F10运营位
+var F10_APPEND = {
+    vote: { //留言
+        script: "",
+        basePath: "",
+        filePath: "",
+        queryStr: "",
+        queryStrW: "",
+        jObject: null,
+        timer: null,
+        isShow: false,
+        init: function() {
+            var code = $("#stockCode").val();
+            var html = [
+                '<div class="VoteBox" style="display: none;">',
+                '<div class="frbody">',
+                '<span class="closeBtn">X</span>',
+                '<p class="tit">若您在使用F10的过程中发现错误或有好的建议，请在此反馈。</p>',
+                '<textarea class="inputgray" name="content" value="请在此输入您的宝贵意见......"></textarea>',
+                '<p class="tel clearfix"><span>联系方式</span><input type="text" name="contact" value="" class="inputgray"><a href="javascript:void(0);" class="vbutton">提交</a></p>',
+                '</div>',
+                '<div class="qbox">',
+                '<div class="qtit">常见问题</div>',
+                '<ul class="qlist">',
+                '<li class="hd">问题1：为什么我在这里反馈上市公司的问题没有答复？</li>',
+                '<li class="cont">回答：该平台是同花顺F10的问题反馈平台，而不是您对上市公司提问的平台。若您需要对上市公司进行提问，请点击<a href="/' + code + '/interactive.html#interactive" id="r-widget-interact-f10" taid="f10_inter_tw" title="投资者互动平台">投资者互动平台>></a></li>',
+                '<li class="hd">问题2：同花顺F10股东人数、主力持仓情况为什么不是每天更新？</li>',
+                '<li class="cont">回答：上市公司的股东人数数据由上市公司提供，同花顺F10仅提供数据的展示，故不是每日进行更新。</li>',
+                '<li class="hd">问题3：同花顺F10数据较多，查找不到相应的数据怎么办？</li>',
+                '<li class="cont">回答：您可以通过F10右上角的搜索功能进行搜索相关的数据。比如查找“同花顺总股本是多少”，您只需要输入‘同花顺总股本’点击搜索即可。</li>',
+                '<li class="hd">问题4：发现同花顺F10的错误怎么办？</li>',
+                '<li class="cont">回答：您可以在同花顺F10右侧的问题反馈栏目直接进行反馈，或者拨打同花顺的客服热线95105885进行咨询。</li>',
+                '<li class="hd">问题5：发现同花顺F10的数据更新慢应该怎么办？</li>',
+                '<li class="cont">回答：正常情况下，同花顺F10会在第一时间内更新上市公司公告的数据，如果您发现部分数据更新不及时的情况欢迎在此反馈平台进行反馈。</li>',
+                '<li class="hd">问题6：同花顺F10的数据准确吗？</li>',
+                '<li class="cont">回答：同花顺F10的数据均来自于上市公司的公告，数据精确，但不排除极少数人工录入错误，如有分歧请以上市公司公告为准。</li>',
+                '</ul>',
+                '</div>',
+                '<input type="hidden" name="cate_id" value="0" />',
+                '<input type="hidden" name="username" value="" />',
+                '<input type="hidden" name="code" value="" />',
+                '</div>'
+            ].join("");
+
+            F10_APPEND.vote.jObject = $(html);
+            $("body").append(F10_APPEND.vote.jObject);
+
+            F10_APPEND.vote.bindEvent();
+        },
+        show: function() {
+            F10_APPEND.vote.jObject.show();
+            setTimeout(function() { F10_APPEND.vote.isShow = true }, 0);
+        },
+        hide: function() {
+            F10_APPEND.vote.jObject.hide();
+            setTimeout(function() { F10_APPEND.vote.isShow = false }, 0);
+            $('.VoteBox .inputgray').each(function() {
+                $(this).val('');
+            });
+        },
+        bindEvent: function() {
+            F10_APPEND.vote.jObject.find(".vbutton").click(F10_APPEND.vote.onSubmit);
+
+            //在方框外部点击的时候隐藏
+            $(document).click(function(e) {
+                var pos = F10_APPEND.vote.jObject.offset();
+                if (F10_APPEND.vote.isShow && !(e.pageX > pos.left && e.pageX < pos.left + F10_APPEND.vote.jObject.width() && e.pageY > pos.top && e.pageY < pos.top + F10_APPEND.vote.jObject.height())) {
+                    F10_APPEND.vote.hide();
+                }
+            });
+
+            //关闭按钮
+            $(".closeBtn").click(F10_APPEND.vote.hide);
+        },
+        onSubmit: function() {
+            var data = {
+                content: F10_APPEND.vote.jObject.find("[name='content']").val(),
+                contact: F10_APPEND.vote.jObject.find("[name='contact']").val(),
+                cate_id: F10_APPEND.vote.jObject.find("[name='cate_id']").val(),
+                username: F10_APPEND.vote.jObject.find("[name='username']").val(),
+                code: F10_APPEND.vote.jObject.find("[name='code']").val(),
+                belongto: F10_APPEND.vote.jObject.find("[name='belongto']").text(),
+                referer: document.location.href
+            };
+
+            if (data.content == '') {
+                $('.voteinfo').find('p').eq(1).html('\u8bf7\u5c3d\u91cf\u8be6\u7ec6\u63cf\u8ff0\u60a8\u7684\u610f\u89c1');
+                $('.voteinfo').show();
+                setTimeout(function() {
+                    $('.voteinfo').hide();
+                }, 2000);
+                return;
+            }
+            if (data.contact == '') {
+                $('.voteinfo').find('p').eq(1).html('\u8bf7\u7559\u4e0b\u60a8\u7684\u8054\u7cfb\u65b9\u5f0f');
+                $('.voteinfo').show();
+                setTimeout(function() {
+                    $('.voteinfo').hide();
+                }, 2000);
+                return;
+            }
+
+            F10_APPEND.vote.submit(data);
+        },
+        submit: function(data) {
+            F10_APPEND.vote.hide();
+            $.ajax({
+                type: "POST",
+                url: "/vote/index.php?s=/Index/post",
+                data: data,
+                error: function() {
+                    $('.voteinfo').find('p').eq(1).html('\u63D0\u4EA4\u5931\u8D25');
+                    $('.voteinfo').show();
+                    setTimeout(function() {
+                        $('.voteinfo').hide();
+                    }, 2000);
+                    return;
+                },
+                success: function(json) {
+                    json = eval('(' + json + ')');
+                    if (json.status == 1) {
+                        $('.votesuccess').show();
+                        setTimeout(function() {
+                            $('.votesuccess').hide();
+                        }, 2000);
+                        F10_APPEND.vote.jObject.find("[name='content']").val('');
+                    } else {
+                        $('.voteinfo').find('p').eq(1).html(json.info);
+                        $('.voteinfo').show();
+                        setTimeout(function() {
+                            $('.voteinfo').hide();
+                        }, 2000);
+                    }
+                }
+            });
+        },
+        setBelongTo: function(o) {
+            F10_APPEND.vote.showPart(2);
+            F10_APPEND.vote.jObject.find("[name='belongto']").text(o);
+        },
+        setCategory: function(o) {
+            F10_APPEND.vote.jObject.find("[name='cate_id']").val(o);
+        },
+        setCode: function(o) {
+            F10_APPEND.vote.showPart(1);
+            F10_APPEND.vote.jObject.find("[name='code']").val(o);
+            F10_APPEND.vote.jObject.find("[name='codeText']").text(o);
+        },
+        setUserName: function(o) {
+            F10_APPEND.vote.jObject.find("[name='username']").val(o);
+        },
+        showTitle: function() {
+            F10_APPEND.vote.jObject.find(".frtitle").show();
+        },
+        showPart: function(i) {
+            F10_APPEND.vote.showTitle();
+            F10_APPEND.vote.jObject.find(".frtitle span[rel='" + i + "']").show();
+        }
+    },
+    //需要修改地址
+    queryStrW: 'http://s.thsi.cn/css/basic/stock/white/append_v2-3.css',
+    queryStr: 'http://s.thsi.cn/css/basic/stock/black/append_v2-3.css',
+    jObject: null,
+    init: function() {
+        //F10_APPEND.addOtherControls();
+        F10_APPEND.vote.init();
+
+        F10_APPEND.addStyle();
+        //var code =$("#stockCode").val();
+        /*if(F10_APPEND.checkQuote()){
+        	var html = [
+        		//'<div class="f10_append">',
+        			'<div class="f10_append_con">',
+        				'<a title="i\u95ee\u8d22" class="f10_append_iwencai idea f10_append_icons" href="javascript:void(0);"></a>',
+        			'</div>',
+        			'<div class="f10_append_con">',
+        				'<a title="\u95ee\u8463\u79d8" class="f10_append_askdm idea f10_append_icons" href="###"></a>',
+        			'</div>',
+        			'<div class="f10_append_con">',
+        				'<a title="\u63D0\u5EFA\u8BAE" class="f10_append_advice idea f10_append_icons" href="javascript:void(0);"></a>',
+        			'</div>',
+        			'<div class="r-widget-con">',
+        				'<a title="\u7F6E\u9876" class="f10_append_gotop f10_append_icons" href="javascript:void(0);"></a>',
+        			'</div>'
+        		//'</div>'
+        	];
+        }else{*/
+
+        var html = [
+            //'<div class="f10_append">',
+            '<div class="f10_append_con">',
+            '<span class="f10_append_box1"><a title="\u56fe\u89e3"  onclick="sendTalog(\'f10_stock_explainf10\')" class="f10_append_explain" linksrc="http://basic.10jqka.com.cn/explain.html" href="javascript:void(0);"></a></span>',
+            '<span class="f10_append_box2"><a title="\u63D0\u5EFA\u8BAE" onclick="sendTalog(\'f10_stock_wtfk\')" class="f10_append_advice idea" href="javascript:void(0);"></a></span>',
+            '</div>',
+            '<div class="r-widget-con">',
+            '<a title="\u7F6E\u9876" class="f10_append_gotop f10_append_icons" href="javascript:void(0);"></a>',
+            '</div>'
+            //'</div>'
+        ];
+        //}
+        html = html.join("");
+        F10_APPEND.jObject = $(html);
+        $("#r-go-top").append(F10_APPEND.jObject);
+
+        F10_APPEND.bindEvent();
+    },
+    bindEvent: function() {
+        F10_APPEND.jObject.find(".f10_append_advice").click(F10_APPEND.voteClick);
+        F10_APPEND.jObject.find(".f10_append_gotop").click(F10_APPEND.toTop);
+        F10_APPEND.jObject.find(".f10_append_iwencai").click(F10_APPEND.iwencai);
+        F10_APPEND.jObject.find(".f10_append_askdm").click(F10_APPEND.askdm);
+        F10_APPEND.jObject.find(".f10_append_explain").click(F10_APPEND.openBrower);
+
+    },
+    askdm: function() {
+        TA.log({ 'id': 'f10_54096cce_233', 'nj': 1 });
+        var code = $("#stockCode").val();
+        //window.open('http://basic.10jqka.com.cn/'+code+'/interactive.html#interactive','_self');
+        window.location.href = "/" + code + "/interactive.html#interactive";
+    },
+    iwencai: function() {
+        TA.log({ 'id': 'f10_54096ca9_259', 'nj': 1 });
+        var url = window.location.href;
+        var arrurl = url.split('/');
+        var arr = arrurl[4].split('.html');
+        var key = arr[0];
+        if (key == "") {
+            window.open('http://www.iwencai.com/#lm_c_hltj');
+        }
+        if (key == "company" || key == "concept" || key == "capital" || key == "field") {
+            window.open('http://www.iwencai.com/#lm_c_gnbk');
+        }
+        if (key == "holder" || key == "equity" || key == "position") {
+            window.open('http://www.iwencai.com/#lm_c_gbgd');
+        }
+        if (key == "news" || key == "event" || key == "interactive") {
+            window.open('http://www.iwencai.com/#lm_c_ggsx');
+        }
+        if (key == "finance" || key == "worth" || key == "bonus" || key == "operate") {
+            window.open('http://www.iwencai.com/#lm_c_cwzb');
+        }
+    },
+    voteClick: function() {
+        if (F10_APPEND.vote.isShow) {
+            F10_APPEND.vote.hide();
+        } else {
+            TA.log({ 'id': 'f10_vote', 'nj': 1 });
+            F10_APPEND.vote.setBelongTo($("#cateName").val());
+            F10_APPEND.vote.setCode($("#stockCode").val());
+            F10_APPEND.vote.setUserName(getCookie('u_name'));
+            F10_APPEND.vote.setCategory("F10");
+            var x = F10_APPEND.jObject.offset().left - 300;
+            var y = F10_APPEND.jObject.offset().top - $(document).scrollTop();
+            F10_APPEND.vote.show();
+        }
+    },
+    toTop: function() {
+        $("html,body").animate({ scrollTop: 0 }, 300);
+    },
+    checkQuote: function() {
+        try { //存在客户端，且非券商客户端
+            external.createObject('Util');
+            var script = document.createElement("script");
+            window.API.use({
+                method: 'Passport.get',
+                data: 'm_qs',
+                success: function(data) {
+                    if (data >= 800) { //非券商客户端
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
+            })
+        } catch (e) { return false; }
+    },
+    addOtherControls: function() {
+        try { //存在客户端，且非券商客户端
+            external.createObject('Util');
+            var script = document.createElement("script");
+            window.API.use({
+                method: 'Passport.get',
+                data: 'm_qs',
+                success: function(data) {
+                    if (data >= 800) { //非券商客户端
+                        //SNS控件
+                        script.type = "text/javascript";
+                        script.src = "http://s.thsi.cn/sns/js/hexin/snsLgtWidget-1.0.6.min.js?" + Math.floor((new Date()).valueOf() / 10000000);
+                        document.body.appendChild(script);
+                        TA.log({ 'id': 'f10_addctr', 'nj': 1, '_sid': '__ths_addctr' });
+                    }
+                }
+            })
+        } catch (e) {}
+    },
+    addStyle: function() {
+        var container = document.getElementsByTagName("head")[0];
+        var addStyle = document.createElement("link");
+        addStyle.rel = "stylesheet";
+        addStyle.type = "text/css";
+        addStyle.media = "screen";
+        if (STOCK_SKIN == 'white') {
+            addStyle.href = F10_APPEND.queryStrW;
+        } else {
+            addStyle.href = F10_APPEND.queryStr;
+        }
+        container.appendChild(addStyle);
+    },
+    openBrower: function(e) {
+        var url = $(this).attr('linksrc');
+        try {
+            external.createObject('Util');
+            window.API.use({
+                method: 'Util.openURL',
+                data: [url, 1]
+
+            })
+        } catch (e) {
+            window.open(url);
+        }
+    }
+};
+
+$(function() {
+    F10_APPEND.init();
+    $('.inputgray').bind('focus', function() {
+        $(this).val('');
+        $(this).addClass('inputyellow');
+    });
+    //鼠标悬停背景
+    $('.f10_append_explain').hover(
+        function() {
+            $('.f10_append_box1').addClass('f10_append_box1hov');
+        },
+        function() {
+            $('.f10_append_box1').removeClass('f10_append_box1hov');
+        }
+    );
+    $('.f10_append_advice').hover(
+        function() {
+            $('.f10_append_box2').addClass('f10_append_box2hov');
+        },
+        function() {
+            $('.f10_append_box2').removeClass('f10_append_box2hov');
+        }
+    );
+    //滚动条
+    /*	$('.VoteBox .qbox').hover(
+    		function(){
+    			$('html').addClass('scrollcss');
+    		},
+    		function(){
+    			$('html').removeClass('scrollcss');
+    		}
+    	);*/
+    /*$('.VoteBox .qbox').hover(
+    	function(){
+    		$('body').mousewheel(function(){
+    			return false;
+    		});
+    		$('.VoteBox .qbox').bind('mousewheel');
+    	},
+    	function(){
+    		$('body').unbind('mousewheel');
+    	}
+    );*/
+});function jsonStockWizard(data) {
+    window.snsAutoComp.ajaxSuccessHandler(data);
+}
+(function() {
+    window.widgetTipsNameSpace = {}
+
+    function addStyle(stylePath) {
+        var container = document.getElementsByTagName("head")[0];
+        var addStyle = document.createElement("link");
+        addStyle.rel = "stylesheet";
+        addStyle.type = "text/css";
+        addStyle.media = "screen";
+        addStyle.href = stylePath;
+        container.appendChild(addStyle);
+    }
+
+    setTimeout(function(){
+        addStyle('http://s.thsi.cn/sns/css/external/snsLgtWidget.201503181341.css');
+    },0);
+    var W_Cookies = {
+        set: function(name, value) {
+            var argv = arguments;
+            var argc = arguments.length;
+            var expires = (argc > 2) ? argv[2] : null;
+            var path = (argc > 3) ? argv[3] : '/';
+            var domain = (argc > 4) ? argv[4] : null;
+            var secure = (argc > 5) ? argv[5] : false;
+            document.cookie = name + "=" + escape(value) + ((expires === null) ? "" : ("; expires=" + expires.toGMTString())) + ((path === null) ? "" : ("; path=" + path)) + ((domain === null) ? "" : ("; domain=" + domain)) + ((secure === true) ? "; secure" : "");
+        },
+
+        get: function(name) {
+            var arg = name + "=";
+            var alen = arg.length;
+            var clen = document.cookie.length;
+            var i = 0;
+            var j = 0;
+            while (i < clen) {
+                j = i + alen;
+                if (document.cookie.substring(i, j) == arg) {
+                    return this.getCookieVal(j);
+                }
+                i = document.cookie.indexOf(" ", i) + 1;
+                if (i === 0) {
+                    break;
+                }
+            }
+            return null;
+        },
+
+        clear: function(name) {
+            if (Util.Cookies.get(name)) {
+                document.cookie = name + "=" + "; expires=Thu, 01-Jan-70 00:00:01 GMT";
+            }
+        },
+
+        getCookieVal: function(offset) {
+            var endstr = document.cookie.indexOf(";", offset);
+            if (endstr == -1) {
+                endstr = document.cookie.length;
+            }
+            return unescape(document.cookie.substring(offset, endstr));
+        }
+    };
+
+    try {
+        //f10\u9875\u9762\u6267\u884C
+        pid = "";
+        window.API.use({
+            method: 'Util.getHxVer',
+            success: function(data) {
+                var ver = data
+                var F10flag = true;
+                ver = ver.substring(3, ver.length - 4);
+                ver = ver.split('.');
+                ver = ver.join('');
+                var thsVersion = parseInt(ver);
+                ver = thsVersion;
+                widgetTipsNameSpace.thsVersion = thsVersion
+                var code = $("#stockCode").val() || "1A0001"
+                widgetTipsNameSpace.code = code;
+                tastatid = 0;
+                if (ver > 83060) {
+                    var htmlArr = [];
+                    htmlArr.push(
+                        '<div class="r-widget-con"><a class="r-widget-topic-f10 widget-icons" id="r-widget-topic-f10" href="javascript:void(0);"></a>',
+                        '<div id="r-widget-tips-t" style="display:none;">',
+                        '<div class="widget-tips-con">',
+                        '<a class="widget-tips-close" href="javascript:void(0);" id="widget-tips-close">X</a>',
+                        '<a class="r-widget-con-text" id="r-widget-con-text" style="display:block; color:#fff; text-decoration:none;" href="javascript:void(0);">\u55B5~\u4F60\u521B\u5EFA\u7684\u5C0F\u7A97\u53E3\u90FD\u5728\u8FD9\u91CC\u54E6??\u9F20\u6807</a>',
+                        '</div>',
+                        '<div class="arrows-box" >',
+                        '<em>&#9670;</em>',
+                        '<span>&#9670;</span>',
+                        '</div>',
+                        '</div>',
+                        '</div>',
+
+                        '<div class="r-widget-con"><a class="r-widget-hot-f10 widget-icons" id="r-widget-hot-f10" href="http://t.10jqka.com.cn/circle/group/3082/" target="_blank"></a></div>'
+
+                    )
+
+                    window.API.use({
+                        method: 'Passport.get',
+                        data: 'userid',
+                        success: function(data) {
+                            userid = data;
+                            window.API.use({
+                                method: 'Ajax.request',
+                                data: {
+                                    url: '/cat/token.lua',
+                                    type: 49
+                                },
+                                success: function(data) {
+                                    var strTemp = $("#r-widget-hot-f10").attr("href");
+                                    $("#r-widget-hot-f10").attr("href", strTemp + "?" + data + '&vu=' + userid);
+
+                                    $("#r-widget-interact-f10").live('click',function() {
+                                        var transUrl = "http://t.10jqka.com.cn/group/theory/stock/?code=" + code + "&ver=" + thsVersion + "&option=interact";
+                                        sendTalog($(this).attr('taid'));
+                                        window.API.use({
+                                            method: 'Util.showWndByGlt',
+                                            data: transUrl,
+                                            success: function() {
+
+                                            }
+                                        })
+
+                                    });
+
+
+                                    $.ajax({
+                                        url: "http://s.thsi.cn/sns/js/external/control-1.0.0.201503191342.js",
+                                        dataType: "script",
+                                        cache: 'true',
+                                        success: function(data) {
+
+                                            //			   remoteTopicF10
+                                            var option = remoteTopicF10.option;
+                                            var url = $.trim(remoteTopicF10.url);
+                                            url = url + "#refCountId=i_5270e12b_290"
+                                            var title = remoteTopicF10.title;
+
+
+                                            if (typeof remoteTopicCode != 'undefined' && remoteTopicCode[code]) {
+                                                title = remoteTopicCode[code].title;
+                                                pid = remoteTopicCode[code].pid;
+                                                option = 2;
+                                                tastatid = remoteTopicCode[code].refcountid;
+
+                                            }
+
+                                            if (option == 2) {
+                                                if (F10flag) {
+
+                                                    //\u8C03\u7528 glt\u8BBA\u80A1\u5F39
+
+                                                } else {
+
+                                                    $("#r-widget-topic").attr("href", url).attr('target', "_blank");
+
+                                                    $("#r-widget-con-text").attr("href", url).attr('target', "_blank");
+
+                                                }
+                                                //\u8BDD\u9898
+                                            } else
+                                            if (option == 1) {
+
+                                                $("#r-widget-topic").attr("href", url).attr('target', "_blank");
+                                                $("#r-widget-con-text").attr("href", url).attr('target', "_blank");
+
+                                            }
+
+                                            $("#r-widget-tips-t").hide();
+
+
+                                        },
+                                        cache: false
+                                    })
+
+                                    $("#r-widget-topic-f10").click(function() {
+                                        if (pid) {
+                                            var transUrl = "http://t.10jqka.com.cn/group/theory/stock/?code=" + code + "&ver=" + thsVersion + "&option=topic" + "&pidd=" + pid;
+                                        } else {
+                                            var transUrl = "http://t.10jqka.com.cn/group/theory/stock/?code=" + code + "&ver=" + thsVersion + "&option=topic";
+                                        }
+
+                                        window.API.use({
+                                            method: 'Util.showWndByGlt',
+                                            data: transUrl,
+                                            success: function() {
+
+                                            }
+                                        })
+
+                                        if (TA) {
+
+                                            if (tastatid) {
+                                                TA.log({
+                                                    id: tastatid,
+                                                    ld: "client",
+                                                    nj: 1
+                                                })
+                                            } else {
+                                                TA.log({
+                                                    id: "snsF10_i_5270e158_535",
+                                                    ld: "client",
+                                                    nj: 1
+                                                })
+                                            }
+
+
+                                        }
+
+
+                                        //\u6253\u5F00\u8BDD\u9898
+                                    });
+
+
+                                    $("#inte_inner").on('click', ".r-widget-interact-f10", function() {
+                                        var transUrl = "http://t.10jqka.com.cn/group/theory/stock/?code=" + code + "&ver=" + thsVersion + "&option=interact";
+                                        sendTalog($(this).attr('taid'));
+                                        window.API.use({
+                                            method: 'Util.showWndByGlt',
+                                            data: transUrl,
+                                            success: function() {
+
+                                            }
+                                        })
+
+                                    });
+                                    $(".content").on('click', ".r-widget-interact-f10", function() {
+                                        var transUrl = "http://t.10jqka.com.cn/group/theory/stock/?code=" + code + "&ver=" + thsVersion + "&option=jinghua";
+
+                                        sendTalog($(this).attr('taid'));
+                                        window.API.use({
+                                            method: 'Util.showWndByGlt',
+                                            data: transUrl,
+                                            success: function() {
+
+                                            }
+                                        })
+                                    });
+                                    $("#r-widget-hot-f10").click(function() {
+
+                                        if (TA) {
+                                            TA.log({
+                                                id: "snsF10_i_5276fbba_201",
+                                                ld: "client",
+                                                nj: 1
+                                            })
+                                        }
+
+                                        //\u6253\u5F00\u70ED\u95E8
+                                        //var transUrl = "http://t.10jqka.com.cn/group/theory/stock/?code="+code+"&ver="+thsVersion+"&tab=hot" ;
+                                        //thsUtil.showWndByGlt(transUrl);
+
+                                    });
+                                }
+
+                            })
+                        }
+                    })
+
+
+
+                } else {
+                    return;
+                }
+            }
+        })
+
+
+
+    } catch (e) {
+        //do nothing....
+
+    }
+
+})();

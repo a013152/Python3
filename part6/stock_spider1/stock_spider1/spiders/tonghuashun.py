@@ -21,6 +21,7 @@ class TonghuashunSpider(scrapy.Spider):
             print(tc_name)
             pass
 
+            response.xpath("//*[@class=\"tl\"]/text()").extract()  #职位信息
         pass
 
 
@@ -29,8 +30,10 @@ class TonghuashunSpider(scrapy.Spider):
 静态页面：
 '''
 
-'''  在 控制台中输入 ：
+'''调试方法  在 控制台中输入 ：
  scrapy shell http://basic.10jqka.com.cn/600004/company.html
  
  response.xpath("//*[@class=\"tc name\"]/a/text()").extract()  #董事会名单
 '''
+
+'''练习  scrapy genspider stock pycs.greedyai.com/'''
